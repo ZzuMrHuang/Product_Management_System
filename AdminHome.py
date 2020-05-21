@@ -11,8 +11,8 @@ from PyQt5.QtWidgets import QStackedWidget
 
 from PyQt5.QtCore import QSize, Qt
 
-from UI.AddProductBatchDetailView import AddProductBatchDetailWidget
-from UI.SelectProductBatchView import SelectProductBatchWidget
+from UI.AddProductView import AddProductWidget
+from UI.SearchProductBatchDetailView import SelectProductBatchDetailWidget
 from Thread.SearchProductBatchThread import SearchProductBatchDetailThread
 
 
@@ -35,6 +35,10 @@ class AdminHome(QWidget):
         # 右侧内容区
         self.right_widget = QStackedWidget(self)
         self.main_layout.addWidget(self.right_widget)
+        # 刷新查询批次界面
+        # self.table_thread = SearchProductBatchDetailThread()
+        # self.table_thread.update_date.connect(self.updateSearchProductBatchDetailWidget)
+        # self.table_thread.start()
 
         self.__setUpUI()
 
@@ -48,9 +52,9 @@ class AdminHome(QWidget):
         self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['产品批次查询', '产品批次新建', '删除产品', '入库信息管理', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
+        list_str = ['产品批次查询', '产品信息新建', '删除产品', '入库信息管理', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
         # 根据list_str设置对应UI
-        url_list = ["self.setSelectProductBatchDetailView", "self.addProductBatchDetailView", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
+        url_list = ["self.setSelectProductBatchDetailView", "self.addProductView", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
 
         for i in range(len(list_str)):
             # 左侧选项的添加
@@ -84,16 +88,14 @@ class AdminHome(QWidget):
         myWidget.setupUi(widget)
         self.right_widget.addWidget(widget)
 
-    def addProductBatchDetailView(self):
-        self.tt = AddProductBatchDetailWidget()
+    def addProductView(self):
+        """产品信息添加的UI"""
+        self.tt = AddProductWidget()
         self.setRightWidget1(self.tt)
 
     def setSelectProductBatchDetailView(self):
         """设置产品批次查询的UI"""
-        self.myWidget = SelectProductBatchWidget()
-        self.table_thread = SearchProductBatchDetailThread()
-        self.table_thread.update_date.connect(self.updateSearchProductBatchDetailWidget)
-        self.table_thread.start()
+        self.myWidget = SelectProductBatchDetailWidget()
         self.setRightWidget1(self.myWidget)
 
     def updateSearchProductBatchDetailWidget(self):
@@ -102,7 +104,8 @@ class AdminHome(QWidget):
         :return:
         """
         print(11111)
-        self.myWidget.queryModel.select()
+        # self.myWidget.update()
+        self.myWidget.queryModel.update()
 
     def test(self):
         pass

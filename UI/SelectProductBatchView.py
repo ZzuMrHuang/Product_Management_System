@@ -11,7 +11,7 @@ from Thread.SearchProductBatchThread import SearchProductBatchDetailThread
 
 
 class SelectProductBatchWidget(QWidget):
-
+    """暂时弃用"""
     def __init__(self):
         super(SelectProductBatchWidget, self).__init__()
         # self.setThread()
