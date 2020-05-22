@@ -11,6 +11,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QDialog
 
+from Utils import openDB
+
 
 class AddProductBatchWidget(object):
     def setupUi(self, Dialog):
@@ -199,28 +201,15 @@ class AddProductBatchWidget(object):
             print(QMessageBox.warning(QDialog(), "警告", "有字段为空，添加失败！", QMessageBox.Yes, QMessageBox.Yes))
             return
         else:
-            db = QSqlDatabase.addDatabase("QSQLITE")
-            # db.setDatabaseName("../db/ProductManagement_new.db")
-            db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-            db.open()
-            query = QSqlQuery()
-            sql = "SELECT * FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % batchNO
-            query.exec(sql)
-            if query.next():
-                print(QMessageBox.warning(QDialog(), "警告", "批次编号已存在，请更换后重试！", QMessageBox.Yes, QMessageBox.Yes))
-                return
-            # 如果产品编号不存在，则提示不能保存
-            sql = "SELECT * FROM T_Product WHERE productNO = '%s'" % productID
-            query.exec(sql)
-            if not query.next():
-                print(QMessageBox.warning(QDialog(), "警告", "产品不存在，请检查后重试！", QMessageBox.Yes, QMessageBox.Yes))
+            num = self.checkOn(batchNO, productID)
+            if num == 0:
                 return
             import time
             createTime = time.strftime("%Y-%m-%d %H:%M:%S")
             insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '--', '%s')" % (
                 batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, remark)
-            query.exec(insert_sql)
-            db.commit()
+            self.query.exec(insert_sql)
+            self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "批次信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
             if confirm == QMessageBox.Yes:
                 Dialog.close()
@@ -259,31 +248,38 @@ class AddProductBatchWidget(object):
             print(QMessageBox.warning(QDialog(), "警告", "有字段为空，修改失败！", QMessageBox.Yes, QMessageBox.Yes))
             return
         else:
-            db = QSqlDatabase.addDatabase("QSQLITE")
-            # db.setDatabaseName("../db/ProductManagement_new.db")
-            db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-            db.open()
-            query = QSqlQuery()
-            sql = "SELECT * FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % batchNO
-            query.exec(sql)
-            if query.next():
-                print(QMessageBox.warning(QDialog(), "警告", "批次编号已存在，请更换后重试！", QMessageBox.Yes, QMessageBox.Yes))
-                return
-            # 如果产品编号不存在，则提示不能保存
-            sql = "SELECT * FROM T_Product WHERE productNO = '%s'" % productID
-            query.exec(sql)
-            if not query.next():
-                print(QMessageBox.warning(QDialog(), "警告", "产品不存在，请检查后重试！", QMessageBox.Yes, QMessageBox.Yes))
+            num = self.checkOn(batchNO, productID)
+            if num == 0:
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
             insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (
                 batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, updateTime,remark)
-            query.exec(insert_sql)
-            db.commit()
+            self.query.exec(insert_sql)
+            self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "批次信息更新成功！", QMessageBox.Yes, QMessageBox.Yes)
             if confirm == QMessageBox.Yes:
                 self.dialog.close()
+
+    def checkOn(self, batchNO, productID):
+        """
+        检查批次号和产品号是否合理
+        :return:
+        """
+        self.db = openDB()
+        self.query = QSqlQuery()
+        sql = "SELECT * FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % batchNO
+        self.query.exec(sql)
+        if self.query.next():
+            print(QMessageBox.warning(QDialog(), "警告", "批次编号已存在，请更换后重试！", QMessageBox.Yes, QMessageBox.Yes))
+            return 0
+        # 如果产品编号不存在，则提示不能保存
+        sql = "SELECT * FROM T_Product WHERE productNO = '%s'" % productID
+        self.query.exec(sql)
+        if not self.query.next():
+            print(QMessageBox.warning(QDialog(), "警告", "产品不存在，请检查后重试！", QMessageBox.Yes, QMessageBox.Yes))
+            return 0
+        return 1
 
     def updateData(self, list, queryModel):
         """

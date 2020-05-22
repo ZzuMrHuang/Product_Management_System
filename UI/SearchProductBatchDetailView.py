@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-
-# Form implementation generated from reading ui file 'SearchProductBatchDetailView.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -12,12 +5,18 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
 from PyQt5.QtWidgets import QTableView, QHeaderView, QMessageBox, QDialog, QWidget, QApplication
 
-from UI.MySearchBatchModel import MySearchBatchTableModel, CheckBoxHeader
+from UI.MySearchBatchModel import CheckBoxHeader, MySearchTableModel
+from UI.SearchView import MySearchWidget
 from UI.SelectSingleProductView import SelectSingleProductWidget
 from UI.addProductBatchView import AddProductBatchWidget
+from Utils import openDB
 
 
-class SelectProductBatchDetailWidget(object):
+class SelectProductBatchDetailWidget(MySearchWidget):
+    def __init__(self):
+        super(SelectProductBatchDetailWidget, self).__init__()
+        self.select_conditions = ["BatchNO", "ProductID", "ReceiveCompanyName"]
+
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(1171, 813)
@@ -69,33 +68,14 @@ class SelectProductBatchDetailWidget(object):
         self.verticalLayout.addLayout(self.horizontalLayout_3)
 
         # 中间手动代码部分 表格UI构建
-        self.db = QSqlDatabase.addDatabase("QSQLITE")
-        self.db.setDatabaseName("./db/ProductManagement_new.db")
-        self.db.open()
+        self.db = openDB()
         self.tableView = QTableView()
         self.tableView.horizontalHeader().setStretchLastSection(True)
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 
         # hsj 自动义的tableModel
-        self.queryModel = MySearchBatchTableModel()
-
-        # self.queryModel.setTable("T_Product_BatchDetail")
-        # # self.queryModel.setEditStrategy(QSqlTableModel.OnFieldChange)
-        # self.queryModel.select()
-        #
-        # self.queryModel.setHeaderData(0, Qt.Horizontal, "ID")
-        # self.queryModel.setHeaderData(1, Qt.Horizontal, "产品ID")
-        # self.queryModel.setHeaderData(2, Qt.Horizontal, "批次号")
-        # self.queryModel.setHeaderData(3, Qt.Horizontal, "交付日期")
-        # self.queryModel.setHeaderData(4, Qt.Horizontal, "交付人员")
-        # self.queryModel.setHeaderData(5, Qt.Horizontal, "接收单位")
-        # self.queryModel.setHeaderData(6, Qt.Horizontal, "接收人员")
-        # self.queryModel.setHeaderData(8, Qt.Horizontal, "创建人员ID")
-        # self.queryModel.setHeaderData(9, Qt.Horizontal, "创建时间")
-        # self.queryModel.setHeaderData(10, Qt.Horizontal, "修改人员ID")
-        # self.queryModel.setHeaderData(11, Qt.Horizontal, "修改时间")
-        # self.queryModel.setHeaderData(12, Qt.Horizontal, "备注")
-
+        headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        self.queryModel = MySearchTableModel("T_Product_BatchDetail", headerRow)
 
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()
@@ -103,8 +83,6 @@ class SelectProductBatchDetailWidget(object):
         self.header.clicked.connect(self.queryModel.headerClick)
         self.tableView.setModel(self.queryModel)
         self.verticalLayout.addWidget(self.tableView)
-
-
 
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
@@ -162,14 +140,6 @@ class SelectProductBatchDetailWidget(object):
         self.previousButton.setText(_translate("Form", "上一页"))
         self.nextButton.setText(_translate("Form", "下一页"))
 
-    def updateUI(self):
-        """
-        hsj 跳转的后更新
-        :return:
-        """
-        self.jumpEdit.setText(str(self.queryModel.currentPage + 1))
-
-
     def bindButton(self):
         """
         hsj 绑定按钮
@@ -191,157 +161,6 @@ class SelectProductBatchDetailWidget(object):
         self.jumpButton.clicked.connect(self.jumpButtonEvent)
         # 添加查询
         self.searchButton.clicked.connect(self.searchButtonEvent)
-
-
-    def deleteButtonEvent(self):
-        """
-        hsj 删除批次按钮绑定事件
-        :return:
-        """
-        # print(self.queryModel.checkList.count("Checked"))
-        # 如果没有选中数据，则提示无数据
-        if self.queryModel.checkList.count("Checked") == 0:
-            QMessageBox.warning(QDialog(), "警告", "没有数据被选中，请选中后重试！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        a = QMessageBox.information(QDialog(), "提示", "是否确认删除？", QMessageBox.Yes, QMessageBox.No)
-        if a == QMessageBox.No:
-            return
-        self.queryModel.delete()
-        self.queryModel.update()
-
-    def addButtonEvent(self):
-        """
-        hsj 新建产品批次
-        :return:
-        """
-        form = QDialog()
-        w = AddProductBatchWidget()
-        w.setupUi(form)
-        form.show()
-        a = form.exec_()
-        # 如果对话框关闭，则对查询数据进行更行
-        if a == 0:
-            self.queryModel.refreshPage()
-            self.queryModel.update()
-
-    def selectDetailProductButtonEvent(self):
-        """
-        hsj 根据批次中的产品Id查询产品详细信息
-        :return:
-        """
-        a = self.isCorrect()
-        if a == 0:
-            return
-        result = self.queryModel.selectSingleProduct()
-        productDiglog = SelectSingleProductWidget()
-        form = QDialog()
-        productDiglog.setupUi(form)
-        productDiglog.setData(result)
-        form.show()
-        form.exec()
-
-
-    def updateButtonEvent(self):
-        """
-        hsj 修改产品批次信息
-        :return:
-        """
-        a = self.isCorrect()
-        if a == 0:
-            return
-        result = self.queryModel.selectSingleBatch()
-        batchDialog = AddProductBatchWidget()
-        form = QDialog()
-        batchDialog.setupUi(form)
-        batchDialog.updateData(result, self.queryModel)
-        form.show()
-        a = form.exec()
-        # 如果对话框关闭，则对查询数据进行更行
-        if a == 0:
-            self.queryModel.update()
-
-    def isCorrect(self):
-        """
-        hsj 判断复选框是否选中一个数据
-        :return:
-        """
-        if self.queryModel.checkList.count("Checked") == 0:
-            QMessageBox.warning(QDialog(), "警告", "没有数据被选中，请选中后重试！", QMessageBox.Yes, QMessageBox.Yes)
-            return 0
-        elif self.queryModel.checkList.count("Checked") > 1:
-            QMessageBox.warning(QDialog(), "警告", "数据过多，请选中一条后重试！", QMessageBox.Yes, QMessageBox.Yes)
-            return 0
-        else:
-            return 1
-
-    def preButtonEvent(self):
-        """
-        hsj 上一页按钮事件
-        :return:
-        """
-        if self.queryModel.currentPage == 0:
-            QMessageBox.information(QDialog(), "提示", "已经是第一页！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        else:
-            self.queryModel.prePage()
-            self.queryModel.update()
-            self.updateUI()
-
-    def nextButtonEvent(self):
-        """
-        hsj 下一页按钮事件
-        :return:
-        """
-        if (self.queryModel.currentPage + 1) == self.queryModel.totalPage:
-            QMessageBox.information(QDialog(), "提示", "已经是最后一页！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        else:
-            self.queryModel.nextPage()
-            self.queryModel.update()
-            self.updateUI()
-
-
-
-    def jumpButtonEvent(self):
-        """
-        hsj 跳转按钮事件
-        :return:
-        """
-        objectPage = self.jumpEdit.text()
-        if not objectPage.isdigit():
-            QMessageBox.information(QDialog(), "提示", "跳转输入的不是数字，请正确填写后重试！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        else:
-            objectPage = int(objectPage)
-            if objectPage <= 0 or objectPage > self.queryModel.totalPage:
-                QMessageBox.information(QDialog(), "提示", "跳转输入超出范围，请正确填写后重试！", QMessageBox.Yes, QMessageBox.Yes)
-                return
-            else:
-                self.queryModel.currentPage = objectPage - 1
-                self.queryModel.setCurrentData()
-                self.queryModel.update()
-
-    def searchButtonEvent(self):
-        """
-        hsj 输入查询条件查询按钮事件
-        :return:
-        """
-        content = self.searchEdit.text()
-        select_condition = ""
-        if content == "":
-            print(111)
-            self.queryModel.refreshPage()
-            self.queryModel.update()
-        else:
-            n = self.comboBox.currentIndex()
-            if n == 0:
-                select_condition = "BatchNO"
-            elif n == 1:
-                select_condition = "ProductID"
-            elif n == 2:
-                select_condition = "ReceiveCompanyName"
-            self.queryModel.selectBatch(select_condition, content)
-
 
 
 if __name__ == "__main__":

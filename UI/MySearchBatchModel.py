@@ -4,7 +4,7 @@ from PyQt5.QtSql import QSqlDatabase, QSqlQuery
 from PyQt5.QtWidgets import (QApplication, QHeaderView, QStyle, QStyleOptionButton, QTableView)
 from PyQt5.QtCore import (pyqtSignal, Qt, QAbstractTableModel, QModelIndex, QRect, QVariant)
 
-from Thread.SearchProductBatchThread import SearchProductBatchDetailThread
+from Utils import openDB
 
 
 class CheckBoxHeader(QHeaderView):
@@ -50,9 +50,18 @@ class CheckBoxHeader(QHeaderView):
         super(CheckBoxHeader, self).mousePressEvent(event)
 
 
-class MySearchBatchTableModel(QAbstractTableModel):
-    def __init__(self, parent=None):
-        super(MySearchBatchTableModel, self).__init__(parent)
+class MySearchTableModel(QAbstractTableModel):
+    def __init__(self, table, headerRow, parent=None):
+        """
+        hsj 初始化TableModel
+        :param table: 查询的表
+        :param headerRow: 查询显示界面的标题
+        :param parent:
+        """
+        super(MySearchTableModel, self).__init__(parent)
+
+        self.table = table
+        self.setTableInformation()
 
         # 总数据
         self.totalData = self.getData()
@@ -62,80 +71,50 @@ class MySearchBatchTableModel(QAbstractTableModel):
         self.currentPage = 0
         self.data_list = []
         self.totalPage = self.getTotalPage()
-        print(self.totalPage)
+        # print(self.totalPage)
 
+        self.initList()
+
+        # self.data_list = self.getData()
+        # Keep track of which object are checked
+        # self.headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        self.headerRow = headerRow
+        self.checkList = ['Unchecked' for i in range(len(self.data_list))]
+
+    def setTableInformation(self):
+        """
+        hsj 设置表相关信息
+        :return:
+        """
+        if self.table == "T_Product_BatchDetail":
+            self.tableKey = "BatchNO"
+            self.tableLength = 13
+            self.tableForeign = "T_Product"
+            self.tableForeignKey = "ProductNO"
+            self.tableForeignKeyPosition = 2
+            self.tableForeignLength = 14
+
+    def initList(self):
+        """
+        hsj 初始化界面数据
+        :return:
+        """
         if len(self.totalData) <= self.perPageNum:
             self.data_list = self.totalData
         else:
             self.data_list = self.totalData[:self.perPageNum]
 
-        # self.data_list = self.getData()
-        # Keep track of which object are checked
-        self.headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
-        self.checkList = ['Unchecked' for i in range(len(self.data_list))]
-
-
-
-
-    def rowCount(self, QModelIndex):
-        # print(len(self.data_list))
-        return len(self.data_list)
-
-    def columnCount(self, QModelIndex):
-        return len(self.headerRow)
-
-    def data(self, index, role):
-        row = index.row()
-        col = index.column()
-        if role == Qt.DisplayRole:
-            return self.data_list[row][col]
-        elif role == Qt.CheckStateRole:
-            if col == 0:
-                return Qt.Checked if self.checkList[row] == 'Checked' else Qt.Unchecked
-        elif role == Qt.ToolTipRole:
-            if col == 0:
-                return self.checkList[row]
-        elif role == Qt.TextAlignmentRole:
-            return QVariant(Qt.AlignCenter)
-        return QVariant()
-
-    def setData(self, index, value, role):
-        row = index.row()
-        col = index.column()
-        if role == Qt.CheckStateRole and col == 0:
-            self.checkList[row] = 'Checked' if value == Qt.Checked else 'Unchecked'
-            # print(self.checkList)
-        return True
-
-    def flags(self, index):
-        if index.column() == 0:
-            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
-        return Qt.ItemIsEnabled
-
-    def headerData(self, section, orientation, role):
-        if role == Qt.DisplayRole:
-            if orientation == Qt.Horizontal:
-                return self.headerRow[section]
-
-    def headerClick(self, isOn):
-        self.update()
-        self.beginResetModel()
-        if isOn:
-            self.checkList = ['Checked' for i in range(len(self.data_list))]
-            # print(1111)
-        else:
-            self.checkList = ['Unchecked' for i in range(len(self.data_list))]
-        self.endResetModel()
-
     def delete(self):
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        # db.setDatabaseName("../db/ProductManagement_new.db")
-        db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-        db.open()
+        """
+        hsj 删除选中的数据
+        :return:
+        """
+        db = openDB()
         query = QSqlQuery()
         for i, isSelected in enumerate(self.checkList):
             if isSelected == "Checked":
-                sql = "DELETE FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % (self.data_list[i][0])
+                # sql = "DELETE FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % (self.data_list[i][0])
+                sql = "DELETE FROM %s WHERE %s = '%s'" % (self.table, self.tableKey,self.data_list[i][0])
                 query.exec(sql)
                 # sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
@@ -144,41 +123,35 @@ class MySearchBatchTableModel(QAbstractTableModel):
         db.commit()
         self.refreshPage()
 
-    def selectSingleProduct(self):
+    def selectSingleTableForeign(self):
         """
-        hsj 查询单个产品信息
+        hsj 查询单个外键表信息
         :return:
         """
         list = []
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        # db.setDatabaseName("../db/ProductManagement_new.db")
-        db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-        db.open()
+        db = openDB()
         query = QSqlQuery()
         for i, isSelected in enumerate(self.checkList):
             if isSelected == "Checked":
-                sql = "SELECT * FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][2])
+                sql = "SELECT * FROM %s WHERE %s = '%s'" % (self.tableForeign, self.tableForeignKey, self.data_list[i][self.tableForeignKeyPosition])
                 query.exec(sql)
                 break
         if query.next():
-            list = [str(query.value(i)) for i in range(14)]
+            list = [str(query.value(i)) for i in range(self.tableForeignLength)]
         # print(list)
         return list
 
-    def selectSingleBatch(self):
+    def selectSingleTable(self):
         """
-        hsj 查询单个批次信息
+        hsj 查询单个表信息
         :return:
         """
         list = []
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        # db.setDatabaseName("../db/ProductManagement_new.db")
-        db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-        db.open()
+        db = openDB()
         query = QSqlQuery()
         for i, isSelected in enumerate(self.checkList):
             if isSelected == "Checked":
-                sql = "SELECT * FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % (self.data_list[i][0])
+                sql = "SELECT * FROM %s WHERE %s = '%s'" % (self.table, self.tableKey, self.data_list[i][0])
                 query.exec(sql)
                 break
         if query.next():
@@ -186,7 +159,7 @@ class MySearchBatchTableModel(QAbstractTableModel):
         # print(list)
         return list
 
-    def selectBatch(self, select_condition, content):
+    def searchTable(self, select_condition, content):
         """
         hsj 根据条件查询信息，并返回界面
         :param select_condition: 列名
@@ -194,33 +167,32 @@ class MySearchBatchTableModel(QAbstractTableModel):
         :return:
         """
         list = []
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        # db.setDatabaseName("../db/ProductManagement_new.db")
-        db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-        db.open()
+        db = openDB()
         query = QSqlQuery()
-        sql = "SELECT * FROM T_Product_BatchDetail WHERE %s = '%s'" % (select_condition, content)
-        print(sql)
+        sql = "SELECT * FROM %s WHERE %s = '%s' ORDER BY %s" % (self.table, select_condition, content, self.tableKey)
+        # print(sql)
         query.exec(sql)
         while query.next():
-            list.append([str(query.value(i)) for i in range(13)])
-        print(list)
-        self.data_list = list
+            list.append([str(query.value(i)) for i in range(self.tableLength)])
+        # print(list)
+        self.searchRefreshPage(list)
         self.update()
 
-
     def getData(self):
+        """
+        获取所有数据
+        :return:
+        """
         results = []
-        db = QSqlDatabase.addDatabase("QSQLITE")
-        # db.setDatabaseName("../db/ProductManagement_new.db")
-        db.setDatabaseName("./db/ProductManagement_new.db")  # 整合框架时使用
-        db.open()
+        db = openDB()
         query = QSqlQuery()
-        sql = "SELECT * FROM T_Product_BatchDetail"
-        query.exec(sql)
-        # print('已查询')
+        sql = "SELECT * FROM %s ORDER BY %s" % (self.table, self.tableKey)
+        # print(sql)
+        a = query.exec(sql)
+        # print('a', a)
         while(query.next()):
             results.append([query.value(i) for i in range(13)])
+        # print(results)
         return results
 
     def update(self):
@@ -281,14 +253,74 @@ class MySearchBatchTableModel(QAbstractTableModel):
         self.totalPage = self.getTotalPage()
         self.data_list = self.totalData[self.currentPage * self.perPageNum:(self.currentPage + 1) * self.perPageNum]
 
+    def searchRefreshPage(self, list_data):
+        """
+        hsj 查询后更新界面
+        :return:
+        """
+        self.totalData = list_data
+        self.totalPage = self.getTotalPage()
+        self.currentPage = 0
+        self.initList()
 
 
+
+    # hsj 下面是一般不需要调用，且不需要更改的方法
+    def rowCount(self, QModelIndex):
+        # print(len(self.data_list))
+        return len(self.data_list)
+
+    def columnCount(self, QModelIndex):
+        return len(self.headerRow)
+
+    def data(self, index, role):
+        row = index.row()
+        col = index.column()
+        if role == Qt.DisplayRole:
+            return self.data_list[row][col]
+        elif role == Qt.CheckStateRole:
+            if col == 0:
+                return Qt.Checked if self.checkList[row] == 'Checked' else Qt.Unchecked
+        elif role == Qt.ToolTipRole:
+            if col == 0:
+                return self.checkList[row]
+        elif role == Qt.TextAlignmentRole:
+            return QVariant(Qt.AlignCenter)
+        return QVariant()
+
+    def setData(self, index, value, role):
+        row = index.row()
+        col = index.column()
+        if role == Qt.CheckStateRole and col == 0:
+            self.checkList[row] = 'Checked' if value == Qt.Checked else 'Unchecked'
+            # print(self.checkList)
+        return True
+
+    def flags(self, index):
+        if index.column() == 0:
+            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
+        return Qt.ItemIsEnabled
+
+    def headerData(self, section, orientation, role):
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                return self.headerRow[section]
+
+    def headerClick(self, isOn):
+        self.update()
+        self.beginResetModel()
+        if isOn:
+            self.checkList = ['Checked' for i in range(len(self.data_list))]
+        else:
+            self.checkList = ['Unchecked' for i in range(len(self.data_list))]
+        self.endResetModel()
 
 
 if __name__ == '__main__':
     a = QApplication(sys.argv)
     tableView = QTableView()
-    myModel = MySearchBatchTableModel()
+    headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+    myModel = MySearchTableModel("T_Product_BatchDetail", headerRow)
     tableView.setModel(myModel)
     header = CheckBoxHeader()
     tableView.setHorizontalHeader(header)
