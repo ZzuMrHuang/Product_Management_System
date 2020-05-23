@@ -22,7 +22,7 @@
       </font>
      </property>
      <property name="text">
-      <string>产品组件查询</string>
+      <string>产品信息查询</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>
@@ -37,32 +37,32 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QPushButton" name="addBatchButton">
+        <widget class="QPushButton" name="addProductButton">
          <property name="text">
-          <string>新建组件</string>
+          <string>新建产品</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="selectProduct">
+        <widget class="QPushButton" name="selectProductComponent">
          <property name="text">
-          <string>查看子组件</string>
+          <string>查看产品组件</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="alterVBatchButton">
+        <widget class="QPushButton" name="alterProductButton">
          <property name="text">
-          <string>修改组件信息</string>
+          <string>修改产品</string>
          </property>
         </widget>
        </item>
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="deleteBatchButton">
+      <widget class="QPushButton" name="deleteProductButton">
        <property name="text">
-        <string>删除批次</string>
+        <string>删除产品</string>
        </property>
       </widget>
      </item>
@@ -103,6 +103,9 @@
        </item>
        <item>
         <widget class="QComboBox" name="comboBox">
+         <property name="currentIndex">
+          <number>0</number>
+         </property>
          <item>
           <property name="text">
            <string>按产品号查询</string>

@@ -89,10 +89,24 @@ class MySearchTableModel(QAbstractTableModel):
         if self.table == "T_Product_BatchDetail":
             self.tableKey = "BatchNO"
             self.tableLength = 13
+            # 要查询的第二张表的名字
             self.tableForeign = "T_Product"
             self.tableForeignKey = "ProductNO"
             self.tableForeignKeyPosition = 2
             self.tableForeignLength = 14
+        elif self.table == "T_Product":
+            self.tableKey = "ProductNO"
+            self.tableLength = 14
+            self.tableForeign = "T_Product_Component"
+            self.tableForeignKey = "ID"
+            self.tableForeignKeyPosition = 1  # 在本表中是根据本表主键在外表中查询
+            self.tableForeignLength = 18
+        elif self.table == "T_Product_ComponentType":
+            self.tableKey = "ID"
+            self.tableLength = 8
+        elif self.table == "T_Product_Component":
+            self.tableKey = "ID"
+            self.tableLength = 18
 
     def initList(self):
         """
@@ -118,6 +132,45 @@ class MySearchTableModel(QAbstractTableModel):
                 query.exec(sql)
                 # sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
+                # sql = "DELETE FROM T_Product_Component WHERE ProductID = '%s'" % (self.data_list[i][2])
+                # query.exec(sql)
+        db.commit()
+        self.refreshPage()
+
+    def deleteProduct(self):
+        """
+        hsj 删除选中的产品，并且关联删除
+        :return:
+        """
+        db = openDB()
+        query = QSqlQuery()
+        for i, isSelected in enumerate(self.checkList):
+            if isSelected == "Checked":
+                sql = "DELETE FROM T_Product_BatchDetail WHERE ProductNO = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+                sql = "DELETE FROM T_Product_Component WHERE ProductNO = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+                sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+        db.commit()
+        self.refreshPage()
+
+    def deleteCompoment(self):
+        """
+        hsj 删除选中的组件及关联删除
+        :return:
+        """
+        db = openDB()
+        query = QSqlQuery()
+        for i, isSelected in enumerate(self.checkList):
+            if isSelected == "Checked":
+                sql = "DELETE FROM %s WHERE %s = '%s'" % (self.table, self.tableKey, self.data_list[i][0])
+                query.exec(sql)
+                # sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][2])
+                # query.exec(sql)
+                sql = "DELETE FROM %s WHERE ParentID = '%s' AND ProductNO = '%s'" % (self.table, self.data_list[i][0], self.data_list[i][1])
+                print(sql)
+                query.exec(sql)
                 # sql = "DELETE FROM T_Product_Component WHERE ProductID = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
         db.commit()
@@ -155,7 +208,7 @@ class MySearchTableModel(QAbstractTableModel):
                 query.exec(sql)
                 break
         if query.next():
-            list = [str(query.value(i)) for i in range(13)]
+            list = [str(query.value(i)) for i in range(self.tableLength)]
         # print(list)
         return list
 
@@ -191,7 +244,7 @@ class MySearchTableModel(QAbstractTableModel):
         a = query.exec(sql)
         # print('a', a)
         while(query.next()):
-            results.append([query.value(i) for i in range(13)])
+            results.append([query.value(i) for i in range(self.tableLength)])
         # print(results)
         return results
 

@@ -62,13 +62,14 @@ class MySearchWidget(object):
         self.queryModel.delete()
         self.queryModel.update()
 
-    def addButtonEvent(self):
+    def addButtonEvent(self, Widget):
         """
         hsj 新建产品批次
+        :param Widget: 要显示的窗体
         :return:
         """
         form = QDialog()
-        w = AddProductBatchWidget()
+        w = Widget
         w.setupUi(form)
         form.show()
         a = form.exec_()
@@ -78,9 +79,10 @@ class MySearchWidget(object):
             self.queryModel.update()
             self.updateUI()
 
-    def selectDetailProductButtonEvent(self):
+    def selectButtonEvent(self, Widget):
         """
         hsj 根据批次中的产品Id查询产品详细信息
+        :param Widget: 要显示的窗体
         :return:
         """
         # 判断复选框是否只选中一个
@@ -88,7 +90,7 @@ class MySearchWidget(object):
         if a == 0:
             return
         result = self.queryModel.selectSingleTableForeign()
-        productDiglog = SelectSingleProductWidget()
+        productDiglog = Widget
         form = QDialog()
         productDiglog.setupUi(form)
         productDiglog.setData(result)
@@ -96,9 +98,10 @@ class MySearchWidget(object):
         form.exec()
 
 
-    def updateButtonEvent(self):
+    def updateButtonEvent(self, Widget):
         """
         hsj 修改产品批次信息
+        :param Widget: 要显示的窗体
         :return:
         """
         # 判断复选框是否只选中一个
@@ -106,7 +109,7 @@ class MySearchWidget(object):
         if a == 0:
             return
         result = self.queryModel.selectSingleTable()
-        batchDialog = AddProductBatchWidget()
+        batchDialog = Widget
         form = QDialog()
         batchDialog.setupUi(form)
         batchDialog.updateData(result, self.queryModel)

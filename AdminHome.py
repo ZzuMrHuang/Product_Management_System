@@ -14,6 +14,9 @@ from PyQt5.QtCore import QSize, Qt
 from UI.AddProductView import AddProductWidget
 from UI.SearchProductBatchDetailView import SelectProductBatchDetailWidget
 from Thread.SearchProductBatchThread import SearchProductBatchDetailThread
+from UI.SearchProductComponentTypeView import SearchProductComponentTypeWidget
+from UI.SearchProductComponentView import SearchProductComponentWidget
+from UI.SearchProductView import SelectProductWidget
 
 
 class AdminHome(QWidget):
@@ -52,9 +55,9 @@ class AdminHome(QWidget):
         self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['产品批次查询', '产品信息新建', '删除产品', '入库信息管理', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
+        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
         # 根据list_str设置对应UI
-        url_list = ["self.setSelectProductBatchDetailView", "self.addProductView", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
+        url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
 
         for i in range(len(list_str)):
             # 左侧选项的添加
@@ -66,7 +69,12 @@ class AdminHome(QWidget):
 
 
     def display(self, i):
+        # print(self.right_widget.widget(i))
+        # self.a.queryModel.update()
+        # self.b.queryModel.update()
+        # self.c.queryModel.update()
         self.right_widget.setCurrentIndex(i)
+
 
     def setRightWidget(self, layout):
         """
@@ -93,10 +101,25 @@ class AdminHome(QWidget):
         self.tt = AddProductWidget()
         self.setRightWidget1(self.tt)
 
-    def setSelectProductBatchDetailView(self):
+    def setSearchBatchView(self):
         """设置产品批次查询的UI"""
-        self.myWidget = SelectProductBatchDetailWidget()
-        self.setRightWidget1(self.myWidget)
+        self.a = SelectProductBatchDetailWidget()
+        self.setRightWidget1(self.a)
+
+    def setSearchProductView(self):
+        """设置产品查询的UI"""
+        self.b = SelectProductWidget()
+        self.setRightWidget1(self.b)
+
+    def setSearchProductConponentTypeView(self):
+        """设置产品组件类型查询的UI"""
+        self.c = SearchProductComponentTypeWidget()
+        self.setRightWidget1(self.c)
+
+    def setSearchProductConponentView(self):
+        """设置产品组件查询的UI"""
+        self.d = SearchProductComponentWidget()
+        self.setRightWidget1(self.d)
 
     def updateSearchProductBatchDetailWidget(self):
         """

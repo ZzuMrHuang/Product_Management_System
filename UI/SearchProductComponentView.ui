@@ -37,21 +37,21 @@
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QPushButton" name="addBatchButton">
+        <widget class="QPushButton" name="addComponentButton">
          <property name="text">
           <string>新建组件</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="selectProduct">
+        <widget class="QPushButton" name="selectSubComponent">
          <property name="text">
           <string>查看子组件</string>
          </property>
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="alterVBatchButton">
+        <widget class="QPushButton" name="alterComponentButton">
          <property name="text">
           <string>修改组件信息</string>
          </property>
@@ -60,9 +60,9 @@
       </layout>
      </item>
      <item>
-      <widget class="QPushButton" name="deleteBatchButton">
+      <widget class="QPushButton" name="deleteComponentButton">
        <property name="text">
-        <string>删除批次</string>
+        <string>删除组件</string>
        </property>
       </widget>
      </item>
