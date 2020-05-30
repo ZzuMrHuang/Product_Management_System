@@ -8,6 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
@@ -67,7 +68,8 @@ class AddComponentWidget(object):
         self.Label_7 = QtWidgets.QLabel(Dialog)
         self.Label_7.setObjectName("Label_7")
         self.formLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.Label_7)
-        self.startDate = QtWidgets.QLineEdit(Dialog)
+        self.startDate = QtWidgets.QDateEdit(Dialog)
+        self.startDate.setDate(QDate.currentDate())
         self.startDate.setObjectName("startDate")
         self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.startDate)
         self.Label_9 = QtWidgets.QLabel(Dialog)
@@ -172,6 +174,11 @@ class AddComponentWidget(object):
         self.horizontalLayout_2.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
 
+        self.createID.setEnabled(False)
+        self.createTime.setEnabled(False)
+        self.updateTime.setEnabled(False)
+        self.updateID.setEnabled(False)
+
         self.retranslateUi(Dialog)
         self.bindButton(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -201,6 +208,10 @@ class AddComponentWidget(object):
         self.conserveButton.setText(_translate("Dialog", "保存"))
         self.cancelButton.setText(_translate("Dialog", "取消"))
 
+        self.createID.setText("--")
+        self.createTime.setText("--")
+        self.updateID.setText("--")
+        self.updateTime.setText("--")
 
     def bindButton(self, Dialog):
         """
@@ -361,7 +372,7 @@ class AddComponentWidget(object):
         self.displayOrder.setText(list[5])
         self.isLifeRemind.setText(list[6])
         self.life.setText(list[7])
-        self.startDate.setText(list[8])
+        # self.startDate.setText(list[8])
         self.daysBefore.setText(list[9])
         self.isUsedCountLimit.setText(list[10])
         self.maxUsedCount.setText(list[11])

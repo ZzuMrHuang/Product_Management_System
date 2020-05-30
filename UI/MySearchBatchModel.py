@@ -194,6 +194,18 @@ class MySearchTableModel(QAbstractTableModel):
         # print(list)
         return list
 
+    def selectNum(self):
+        """
+        hsj 选中的行号
+        :return:
+        """
+        n = 0
+        for i, isSelected in enumerate(self.checkList):
+            if isSelected == "Checked":
+                n = i
+                break
+        return n
+
     def selectSingleTable(self):
         """
         hsj 查询单个表信息

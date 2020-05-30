@@ -55,7 +55,7 @@ class AdminHome(QWidget):
         self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
+        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '11111', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
         # 根据list_str设置对应UI
         url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
 

@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'AddComponentTypeView.ui'
-#
-# Created by: PyQt5 UI code generator 5.13.0
-#
-# WARNING! All changes made in this file will be lost!
-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtSql import QSqlQuery
@@ -106,6 +100,11 @@ class AddComponentTypeWidget(object):
         self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
+        self.createID.setEnabled(False)
+        self.createTime.setEnabled(False)
+        self.updateTime.setEnabled(False)
+        self.updateID.setEnabled(False)
+
         self.retranslateUi(Dialog)
         self.bindButton(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -124,6 +123,10 @@ class AddComponentTypeWidget(object):
         self.Label_6.setText(_translate("Dialog", "创建人员："))
         self.conserveButton.setText(_translate("Dialog", "保存"))
         self.cancelButton.setText(_translate("Dialog", "取消"))
+        self.createID.setText("--")
+        self.createTime.setText("--")
+        self.updateID.setText("--")
+        self.updateTime.setText("--")
 
     def bindButton(self, Dialog):
         """

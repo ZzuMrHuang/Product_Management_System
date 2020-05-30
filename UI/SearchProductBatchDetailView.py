@@ -167,6 +167,24 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         # 添加查询
         self.searchButton.clicked.connect(self.searchButtonEvent)
 
+    def selectButtonEvent(self, Widget):
+        """
+        hsj 根据批次中的产品Id查询产品详细信息
+        :param Widget: 要显示的窗体
+        :return:
+        """
+        # 判断复选框是否只选中一个
+        a = self.isCorrect()
+        if a == 0:
+            return
+        result = self.queryModel.selectSingleTableForeign()
+        productDiglog = Widget
+        form = QDialog()
+        productDiglog.setupUi(form)
+        productDiglog.setData(result)
+        form.show()
+        form.exec()
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

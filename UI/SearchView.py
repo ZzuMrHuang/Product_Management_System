@@ -79,23 +79,23 @@ class MySearchWidget(object):
             self.queryModel.update()
             self.updateUI()
 
-    def selectButtonEvent(self, Widget):
-        """
-        hsj 根据批次中的产品Id查询产品详细信息
-        :param Widget: 要显示的窗体
-        :return:
-        """
-        # 判断复选框是否只选中一个
-        a = self.isCorrect()
-        if a == 0:
-            return
-        result = self.queryModel.selectSingleTableForeign()
-        productDiglog = Widget
-        form = QDialog()
-        productDiglog.setupUi(form)
-        productDiglog.setData(result)
-        form.show()
-        form.exec()
+    # def selectButtonEvent(self, Widget):
+    #     """
+    #     hsj 根据批次中的产品Id查询产品详细信息
+    #     :param Widget: 要显示的窗体
+    #     :return:
+    #     """
+    #     # 判断复选框是否只选中一个
+    #     a = self.isCorrect()
+    #     if a == 0:
+    #         return
+    #     result = self.queryModel.selectSingleTableForeign()
+    #     productDiglog = Widget
+    #     form = QDialog()
+    #     productDiglog.setupUi(form)
+    #     productDiglog.setData(result)
+    #     form.show()
+    #     form.exec()
 
 
     def updateButtonEvent(self, Widget):

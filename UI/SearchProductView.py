@@ -2,7 +2,9 @@
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableView, QHeaderView, QApplication, QWidget, QMessageBox, QDialog
+from PyQt5.QtCore import Qt
+from PyQt5.QtSql import QSqlQueryModel
+from PyQt5.QtWidgets import QTableView, QHeaderView, QApplication, QWidget, QMessageBox, QDialog, QVBoxLayout
 
 from UI.AddProductView import AddProductWidget
 from UI.MySearchBatchModel import MySearchTableModel, CheckBoxHeader
@@ -156,8 +158,8 @@ class SelectProductWidget(MySearchWidget):
         self.deleteProductButton.clicked.connect(self.deleteButtonEvent)
         # # 新建按钮
         self.addProductButton.clicked.connect(lambda :self.addButtonEvent(AddProductWidget()))
-        # # 查看产品
-        # self.selectProduct.clicked.connect(self.selectDetailProductButtonEvent)
+        # # 查看产品组件
+        self.selectProductComponent.clicked.connect(self.selectDetailComponentButtonEvent)
         # 修改按钮
         self.alterProductButton.clicked.connect(lambda :self.updateButtonEvent(AddProductWidget()))
         # 上一页
@@ -184,6 +186,36 @@ class SelectProductWidget(MySearchWidget):
             return
         self.queryModel.deleteProduct()
         self.queryModel.update()
+
+    def selectDetailComponentButtonEvent(self):
+        """
+        hsj 搜索产品的相关组件
+        :return:
+        """
+        # 判断复选框是否只选中一个
+        a = self.isCorrect()
+        if a == 0:
+            return
+        select_num = self.queryModel.selectNum()
+        db = openDB()
+        queryModel = QSqlQueryModel()
+        print("SELECT * FROM T_Product_Component WHERE ID = %s" % (self.queryModel.data_list[select_num][0]))
+        queryModel.setQuery("SELECT * FROM T_Product_Component WHERE ProductNO = %s" % (self.queryModel.data_list[select_num][0]))
+        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "排序索引", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        for i in range(len(headerRow)):
+            queryModel.setHeaderData(i, Qt.Horizontal, headerRow[i])
+        form = QDialog()
+        tableView = QTableView()
+        tableView.setModel(queryModel)
+        tableView.show()
+        layout = QVBoxLayout()
+        layout.addWidget(tableView)
+        form.setLayout(layout)
+        form.showMaximized()
+        form.exec()
+
+
+
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
