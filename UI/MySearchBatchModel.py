@@ -86,7 +86,7 @@ class MySearchTableModel(QAbstractTableModel):
         hsj 设置表相关信息
         :return:
         """
-        if self.table == "T_Product_BatchDetail":
+        if self.table == "T_Product_BatchDetail":  # 黄帅杰开始
             self.tableKey = "BatchNO"
             self.tableLength = 13
             # 要查询的第二张表的名字
@@ -106,7 +106,21 @@ class MySearchTableModel(QAbstractTableModel):
             self.tableLength = 8
         elif self.table == "T_Product_Component":
             self.tableKey = "ID"
-            self.tableLength = 18
+            self.tableLength = 18  # 黄帅杰结束
+        elif self.table =="T_Knowladge_Base_Mangement":
+            self.tableKey="Num"
+            self.tableLength = 4
+            self.tableForeign = "T_Knowladge_Base_Mangement"
+            self.tableForeignKey = "Num"
+            self.tableForeignKeyPosition = 1
+            self.tableForeignLength = 4
+        elif self.table == "User":  # 刘敬楷开始
+            self.tableKey = "UserId"
+            self.tableLength = 5
+        elif self.table == "Admin_Menu":
+            self.tableKey = "ID"
+            self.tableLength = 7  # 刘敬楷结束
+
 
     def initList(self):
         """
