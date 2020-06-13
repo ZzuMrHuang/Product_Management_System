@@ -12,7 +12,17 @@ from PyQt5.QtWidgets import QStackedWidget
 
 from PyQt5.QtCore import QSize, Qt
 
+from FaultDiagnosis import FaultDiagnosis
 from FunctionManageView import FunctionManageWidget
+from InStorageView import InStorageWidget
+from LifeReminder import LifeReminder
+from MR_SearchMRView import SelectMRWidget
+from Maintenance import Maintenance
+from OutInputDBTimes import OutInputDBTimes
+from OutStorageView import OutStorageWidget
+from ProductDeliveryRegistration import ProductDeliveryRegistration
+from ProductInventory import ProductInventory
+from SearchMWView import SearchMWWidget
 from UI.AddProductView import AddProductWidget
 from UI.KnowledgeBaseManage import KnowledgeBaseManage
 from UI.SearchProductBatchDetailView import SelectProductBatchDetailWidget
@@ -50,28 +60,6 @@ class AdminHome(QWidget):
 
         self.__setUpUI()
 
-    # def __setUpUI(self):
-    #     """加载界面UI"""
-    #     # list和右边窗口的index对应绑定
-    #     self.left_widget.currentRowChanged.connect(self.display)
-    #     # 去掉边框
-    #     self.left_widget.setFrameShape(QListWidget.NoFrame)
-    #     # 隐藏滚动条
-    #     self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    #     self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    #
-    #     list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '知识库管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
-    #     # 根据list_str设置对应UI
-    #     url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.setKnowledgeBaseManageWidget", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
-    #
-    #     for i in range(len(list_str)):
-    #         # 左侧选项的添加
-    #         self.item = QListWidgetItem(list_str[i], self.left_widget)
-    #         self.item.setSizeHint(QSize(30, 60))
-    #         self.item.setTextAlignment(Qt.AlignCenter)
-    #         # 根据对应函数设置右侧显示内容
-    #         eval(url_list[i] + "()")
-
     def __setUpUI(self):
         """加载界面UI"""
         # list和右边窗口的index对应绑定
@@ -82,44 +70,87 @@ class AdminHome(QWidget):
         self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        #list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
-        list_str = list()
-        #链接数据库
-        db = openDB()
-        #查询出isvalid为true的项显示
-        q = QSqlQuery()
-        #当isvalid为false时，list对应窗口会出错
-        sql_code = "SELECT ChineseName FROM Admin_Menu WHERE IsValid = '%s'" % "true"
-        if q.exec_(sql_code):
-            while q.next():
-                string = q.value(0)
-                list_str.append(string)
-
-        #出现问题，很奇怪，list_str与url_list不对应
+        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒', '知识库管理', '维护方式管理', '维护记录管理', '故障诊断与处理', '业务管理', '用户管理']
         # 根据list_str设置对应UI
-        #url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.setKnowledgeBaseManageWidget", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
         url_list = ["self.setSearchBatchView",                  #1
                     "self.setSearchProductView",                #2
                     "self.setSearchProductConponentView",       #3
                     "self.setSearchProductConponentTypeView",   #4
+                    "self.setInStorageView",
+                    "self.setOutStorageView",
+                    "self.setOutInputDBTimes",                  #6
+                    "self.setMaintenance",                      #7
+                    "self.setProductDeliveryRegistration",      #8
+                    "self.setProductInventory",
+                    "self.setLifeReminder",
                     "self.setKnowledgeBaseManageWidget",        #5
-                    "self.test",                                #6
-                    "self.test",                                #7
-                    "self.test",                                #8
-                    "self.test",                                #9
-                    "self.setUserManageView",                   #10
-                    "self.setKnowledgeBaseManageWidget",        #11
-                    "self.setFunctionManageView"]               #12
-        db.close()
+                    "self.setMaintenanceWayView",               #8
+                    "self.setMaintenanceRecordView",            #9
+                    "self.FaultDiagnosis",
+                    "self.setFunctionManageView",
+                    "self.setUserManageView" ]               #12
+
         for i in range(len(list_str)):
             # 左侧选项的添加
             self.item = QListWidgetItem(list_str[i], self.left_widget)
             self.item.setSizeHint(QSize(30, 60))
             self.item.setTextAlignment(Qt.AlignCenter)
             # 根据对应函数设置右侧显示内容
-            #print(i)
-            #print(url_list[i] + "()")
             eval(url_list[i] + "()")
+
+    # def __setUpUI(self):
+    #     """加载界面UI"""
+    #     # list和右边窗口的index对应绑定
+    #     self.left_widget.currentRowChanged.connect(self.display)
+    #     # 去掉边框
+    #     self.left_widget.setFrameShape(QListWidget.NoFrame)
+    #     # 隐藏滚动条
+    #     self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    #     self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+    #
+    #     #list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
+    #     list_str = list()
+    #     #链接数据库
+    #     db = openDB()
+    #     #查询出isvalid为true的项显示
+    #     q = QSqlQuery()
+    #     #当isvalid为false时，list对应窗口会出错
+    #     sql_code = "SELECT ChineseName FROM Admin_Menu WHERE IsValid = '%s'" % "true"
+    #     if q.exec_(sql_code):
+    #         while q.next():
+    #             string = q.value(0)
+    #             list_str.append(string)
+    #
+    #     #出现问题，很奇怪，list_str与url_list不对应
+    #     # 根据list_str设置对应UI
+    #     #url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.setKnowledgeBaseManageWidget", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
+    #     url_list = ["self.setSearchBatchView",                  #1
+    #                 "self.setSearchProductView",                #2
+    #                 "self.setSearchProductConponentView",       #3
+    #                 "self.setSearchProductConponentTypeView",   #4
+    #                 "self.setOutInputDBTimes",                  #6
+    #                 "self.setMaintenance",                      #7
+    #                 "self.setProductDeliveryRegistration",      #8
+    #                 "self.setProductInventory",
+    #                 "self.setLifeReminder",
+    #                 "self.setKnowledgeBaseManageWidget",        #5
+    #                 "self.test",                                #6
+    #                 "self.test",                                #7
+    #                 "self.test",                                #8
+    #                 "self.test",                                #9
+    #                 "self.setUserManageView",                   #10
+    #                 "self.setKnowledgeBaseManageWidget",        #11
+    #                 "self.setFunctionManageView"]               #12
+    #     db.close()
+    #     for i in range(len(list_str)):
+    #         # 左侧选项的添加
+    #         self.item = QListWidgetItem(list_str[i], self.left_widget)
+    #         self.item.setSizeHint(QSize(30, 60))
+    #         self.item.setTextAlignment(Qt.AlignCenter)
+    #         # 根据对应函数设置右侧显示内容
+    #         #print(i)
+    #         #print(url_list[i] + "()")
+    #         eval(url_list[i] + "()")
 
 
     def display(self, i):
@@ -175,21 +206,31 @@ class AdminHome(QWidget):
         self.d = SearchProductComponentWidget()
         self.setRightWidget1(self.d)
 
+    def setInStorageView(self):
+        """设置入库管理的UI"""
+        self.r = InStorageWidget()
+        self.setRightWidget1(self.r)
+
+    def setOutStorageView(self):
+        """设置出库管理的UI"""
+        self.s = OutStorageWidget()
+        self.setRightWidget1(self.s)
+
     def setKnowledgeBaseManageWidget(self):
         """设置知识库管理UI"""
         self.e = KnowledgeBaseManage()
         self.setRightWidget1(self.e)
 
-        #设置右侧的业务管理功能
+    # 设置右侧的业务管理功能
     def setFunctionManageView(self):
         self.f = FunctionManageWidget()
         self.setRightWidget1(self.f)
 
-    #设置右侧的用户管理界面
+    # 设置右侧的用户管理界面
     def setUserManageView(self):
         self.e = UserManageWidget()
         self.setRightWidget1(self.e)
-        #print("UserManageWidget初始化完成")
+        # print("UserManageWidget初始化完成")
 
     def updateSearchProductBatchDetailWidget(self):
         """
@@ -199,6 +240,51 @@ class AdminHome(QWidget):
         print(11111)
         # self.myWidget.update()
         self.myWidget.queryModel.update()
+
+    def setOutInputDBTimes(self):
+        '''产品出入库'''
+        self.o = OutInputDBTimes()
+        self.setRightWidget1(self.o)
+
+    def setMaintenance(self):
+        '''维修保养'''
+        self.m = Maintenance()
+        self.setRightWidget1(self.m)
+
+    def setProductDeliveryRegistration(self):
+        '''产品交付登记'''
+        self.d = ProductDeliveryRegistration()
+        self.setRightWidget1(self.d)
+
+    def setProductInventory(self):
+        '''产品库存'''
+        self.i = ProductInventory()
+        self.setRightWidget1(self.i)
+
+    def setLifeReminder(self):
+        '''寿命到期提醒'''
+        self.l = LifeReminder()
+        self.setRightWidget1(self.l)
+
+    def setMaintenanceWayView(self):
+        """设置维保方式的UI"""
+        self.h = SearchMWWidget()
+        self.setRightWidget1(self.h)
+
+    def setMaintenanceRecordView(self):
+        """设置维保方式的UI"""
+        self.j = SelectMRWidget()
+        self.setRightWidget1(self.j)
+
+    def FaultDiagnosis(self):
+        """
+        xcy 设置故障诊断界面
+        :return:
+        """
+        self.k = FaultDiagnosis()
+        self.setRightWidget1(self.k)
+        print("设置故障诊断界面")
+
 
     def test(self):
         pass

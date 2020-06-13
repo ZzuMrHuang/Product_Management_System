@@ -11,6 +11,10 @@ QListWidget {
     background: #F5F5F5;*/
 }
 
+QListWidget::Item {
+    /*background: lightGray;*/
+    max-height:30px;
+}
 QListWidget::Item:selected {
     /*background: lightGray;*/
     border-left: 5px solid orange;

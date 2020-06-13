@@ -8,6 +8,7 @@ from Utils import openDB
 
 
 class CheckBoxHeader(QHeaderView):
+    # 俞欣
     clicked = pyqtSignal(bool)
 
     _x_offset = 3
@@ -50,19 +51,19 @@ class CheckBoxHeader(QHeaderView):
         super(CheckBoxHeader, self).mousePressEvent(event)
 
 
-class MySearchTableModel(QAbstractTableModel):
-    def __init__(self, table, headerRow, parent=None):
+class MySearchTableModelPIM(QAbstractTableModel):
+    def __init__(self, table, headerRow, slt, parent=None):
         """
         hsj 初始化TableModel
         :param table: 查询的表
         :param headerRow: 查询显示界面的标题
         :param parent:
         """
-        super(MySearchTableModel, self).__init__(parent)
+        super(MySearchTableModelPIM, self).__init__(parent)
 
         self.table = table
         self.setTableInformation()
-
+        self.slt = slt
         # 总数据
         self.totalData = self.getData()
 
@@ -86,7 +87,7 @@ class MySearchTableModel(QAbstractTableModel):
         hsj 设置表相关信息
         :return:
         """
-        if self.table == "T_Product_BatchDetail":  # 黄帅杰开始
+        if self.table == "T_Product_BatchDetail":
             self.tableKey = "BatchNO"
             self.tableLength = 13
             # 要查询的第二张表的名字
@@ -106,55 +107,28 @@ class MySearchTableModel(QAbstractTableModel):
             self.tableLength = 8
         elif self.table == "T_Product_Component":
             self.tableKey = "ID"
-            self.tableLength = 18  # 黄帅杰结束
-        elif self.table == "T_Out_Detail":  # 许帅开始
-            self.tableKey = "ID"
-            self.tableLength = 11
-        elif self.table == "T_In_Detail":
-            self.tableKey = "ID"
-            self.tableLength = 11  # 许帅结束
-        elif self.table =="T_Knowladge_Base_Mangement":
-            self.tableKey="Num"
-            self.tableLength = 4
-            self.tableForeign = "T_Knowladge_Base_Mangement"
-            self.tableForeignKey = "Num"
-            self.tableForeignKeyPosition = 1
-            self.tableForeignLength = 4
-        elif self.table == "User":  # 刘敬楷开始
-            self.tableKey = "UserId"
-            self.tableLength = 5
-        elif self.table == "Admin_Menu":
-            self.tableKey = "ID"
-            self.tableLength = 7  # 刘敬楷结束
-        elif self.table == "MaintenanceRecord":  # 李振开始
-            self.tableKey = "mrID"
             self.tableLength = 18
+        elif self.table == "T_Out_Base":
+            self.tableKey = "ID"
+            self.tableLength = 12
+        elif self.table == "T_ProductTask_DeliveryAcceptance":
+            self.tableKey = "ID"
+            self.tableLength = 22
         elif self.table == "MaintenanceWay":
             self.tableKey = "MaintenanceWayID"
-            self.tableLength = 18
-            # 要查询的第二张表的名字
-            # self.tableForeign = "Product"
-            # self.tableForeignKey = "ProductID"
-            # self.tableForeignKeyPosition = 2
-            # self.tableForeignLength = 14  # 李振结束
-        elif self.table== "T_Fault_Diagnosis":  # 薛程耀开始
-            self.tableKey="batchNO"
-            self.tableLength = 5  # 薛程耀结束
-
-
-
+            self.tableLength = 12
 
     def initList(self):
-            """
-            hsj 初始化界面数据
-            :return:
-            """
-            if len(self.totalData) <= self.perPageNum:
-                self.data_list = self.totalData
-            else:
-                self.data_list = self.totalData[:self.perPageNum]
+        """
+        hsj 初始化界面数据
+        :return:
+        """
+        if len(self.totalData) <= self.perPageNum:
+            self.data_list = self.totalData
+        else:
+            self.data_list = self.totalData[:self.perPageNum]
 
-    def delete(self):
+    '''def delete(self):
         """
         hsj 删除选中的数据
         :return:
@@ -171,9 +145,9 @@ class MySearchTableModel(QAbstractTableModel):
                 # sql = "DELETE FROM T_Product_Component WHERE ProductID = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
         db.commit()
-        self.refreshPage()
+        self.refreshPage()'''
 
-    def deleteProduct(self):
+    '''def deleteProduct(self):
         """
         hsj 删除选中的产品，并且关联删除
         :return:
@@ -189,9 +163,9 @@ class MySearchTableModel(QAbstractTableModel):
                 sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][0])
                 query.exec(sql)
         db.commit()
-        self.refreshPage()
+        self.refreshPage()'''
 
-    def deleteCompoment(self):
+    '''def deleteCompoment(self):
         """
         hsj 删除选中的组件及关联删除
         :return:
@@ -210,38 +184,7 @@ class MySearchTableModel(QAbstractTableModel):
                 # sql = "DELETE FROM T_Product_Component WHERE ProductID = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
         db.commit()
-        self.refreshPage()
-
-    def deleteMW(self):
-        """
-        李振
-        :return:
-        """
-        db = openDB()
-        query = QSqlQuery()
-        print("这里执行了：")
-        for i, isSelected in enumerate(self.checkList):
-            if isSelected == "Checked":
-                sql = "DELETE FROM MaintenanceWay WHERE MaintenanceWayID = '%s'" % (self.data_list[i][0])
-                query.exec(sql)
-        db.commit()
-        self.refreshPage()
-
-    def deleteMR(self):
-        """
-        李振
-        :return:
-        """
-        db = openDB()
-        query = QSqlQuery()
-        print("这里执行了：")
-        for i, isSelected in enumerate(self.checkList):
-            if isSelected == "Checked":
-                sql = "DELETE FROM MaintenanceRecord WHERE MrID = '%s'" % (self.data_list[i][0])
-                query.exec(sql)
-        db.commit()
-        self.refreshPage()
-
+        self.refreshPage()'''
 
     def selectSingleTableForeign(self):
         """
@@ -261,18 +204,6 @@ class MySearchTableModel(QAbstractTableModel):
         # print(list)
         return list
 
-    def selectNum(self):
-        """
-        hsj 选中的行号
-        :return:
-        """
-        n = 0
-        for i, isSelected in enumerate(self.checkList):
-            if isSelected == "Checked":
-                n = i
-                break
-        return n
-
     def selectSingleTable(self):
         """
         hsj 查询单个表信息
@@ -291,7 +222,7 @@ class MySearchTableModel(QAbstractTableModel):
         # print(list)
         return list
 
-    def searchTable(self, select_condition, content):
+    def searchTable(self,sql):
         """
         hsj 根据条件查询信息，并返回界面
         :param select_condition: 列名
@@ -301,14 +232,36 @@ class MySearchTableModel(QAbstractTableModel):
         list = []
         db = openDB()
         query = QSqlQuery()
-        sql = "SELECT * FROM %s WHERE %s = '%s' ORDER BY %s" % (self.table, select_condition, content, self.tableKey)
-        # print(sql)
-        query.exec(sql)
+        #sql = "SELECT * FROM %s WHERE %s = '%s' ORDER BY %s" % (self.table, select_condition, content, self.tableKey)
+        sql1 = "SELECT %s FROM %s %s ORDER BY %s" % (self.slt,self.table, sql, self.tableKey)
+        print(sql1)
+        query.exec(sql1)
         while query.next():
             list.append([str(query.value(i)) for i in range(self.tableLength)])
         # print(list)
         self.searchRefreshPage(list)
         self.update()
+
+    def searchTableD(self,sqlt,sql):
+        """
+        hsj 根据条件查询信息，并返回界面
+        :param select_condition: 列名
+        :param content: 具体查询条件
+        :return:
+        """
+        list = []
+        db = openDB()
+        query = QSqlQuery()
+        #sql = "SELECT * FROM %s WHERE %s = '%s' ORDER BY %s" % (self.table, select_condition, content, self.tableKey)
+        sql1 = "SELECT %s FROM %s %s ORDER BY %s" % (sqlt,self.table, sql, self.tableKey)
+        print(sql1)
+        query.exec(sql1)
+        while query.next():
+            list.append([str(query.value(i)) for i in range(self.tableLength)])
+        # print(list)
+        self.searchRefreshPage(list)
+        self.update()
+
 
     def getData(self):
         """
@@ -318,13 +271,13 @@ class MySearchTableModel(QAbstractTableModel):
         results = []
         db = openDB()
         query = QSqlQuery()
-        sql = "SELECT * FROM %s ORDER BY %s" % (self.table, self.tableKey)
+        sql = "SELECT %s FROM %s ORDER BY %s" % (self.slt,self.table, self.tableKey)
         # print(sql)
         a = query.exec(sql)
         # print('a', a)
         while(query.next()):
             results.append([query.value(i) for i in range(self.tableLength)])
-        # print(results)
+            #print(results)
         return results
 
     def update(self):
@@ -451,8 +404,9 @@ class MySearchTableModel(QAbstractTableModel):
 if __name__ == '__main__':
     a = QApplication(sys.argv)
     tableView = QTableView()
+    slt = "ProductName"
     headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
-    myModel = MySearchTableModel("T_Product_BatchDetail", headerRow)
+    myModel = MySearchTableModelPIM("T_Product_BatchDetail", headerRow, slt)
     tableView.setModel(myModel)
     header = CheckBoxHeader()
     tableView.setHorizontalHeader(header)
