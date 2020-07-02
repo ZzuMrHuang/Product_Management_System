@@ -9,7 +9,7 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
+# 好像暂时废弃了？
 class AddProductBatchDetailWidget(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")

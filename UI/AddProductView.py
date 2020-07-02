@@ -259,6 +259,10 @@ class AddProductWidget(object):
         else:
             num = self.checkOn(productNO)
             if num == 0:
+                revert_sql = "INSERT INTO T_Product VALUES ('%s', '--', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" \
+                             % (self.pre_list[0], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6], self.pre_list[7], self.pre_list[8], self.pre_list[10], self.pre_list[12], self.pre_list[13])
+                self.query.exec(revert_sql)
+                self.db.commit()
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -289,6 +293,7 @@ class AddProductWidget(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.label.setText("修改产品信息")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))

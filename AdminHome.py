@@ -1,9 +1,10 @@
+import qdarkstyle
 import sys
 
 import qdarkstyle
 from PyQt5.QtGui import QIcon
 from PyQt5.QtSql import QSqlQuery
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QTreeWidget, QTreeWidgetItem, QVBoxLayout
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QListWidgetItem
 from PyQt5.QtWidgets import QListWidget
@@ -31,46 +32,153 @@ from UI.SearchProductComponentTypeView import SearchProductComponentTypeWidget
 from UI.SearchProductComponentView import SearchProductComponentWidget
 from UI.SearchProductView import SelectProductWidget
 from UserManageView import UserManageWidget
-from Utils import openDB
+from PyQt5.QtWidgets import (QApplication, QWidget, QHBoxLayout,
+                             QTreeWidget, QTreeWidgetItem,
+                             QGroupBox, QStackedWidget)
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtCore import QSize
+
 
 
 class AdminHome(QWidget):
-    """登录后的主界面，该界面采用侧边栏+内容区相结合的方式"""
-    def __init__(self):
+    def  __init__(self):
         super(AdminHome, self).__init__()
-        # 设置窗口大小和标题
-        self.resize(900, 600)
+        self.setMinimumHeight(600);
+        self.setMinimumWidth(800);
         self.setWindowTitle("欢迎使用产品管理系统")
-        # 导入QListWidget的qss样式
-        with open("./QListWidgetQSS.qss", 'r') as f:
+        ##main_layout.setMargin(5)
+        ##main_layout.setSpace(5)
+        with open("./leftMenuStyle.qss", 'r', encoding='utf-8') as f:
             self.list_style = f.read()
-        self.main_layout = QHBoxLayout(self)
-        self.main_layout.setContentsMargins(0, 0, 0, 0)
-        # 左侧选项表
-        self.left_widget = QListWidget()
-        self.left_widget.setStyleSheet(self.list_style)
-        self.main_layout.addWidget(self.left_widget)
-        # 右侧内容区
+        self.creat_main_layout()
+        self.creat_bar_navigation()
+        self.creat_left_box()
+        self.setStyleSheet(self.list_style)
+
+
+    def get_bar_list(self):
+        bar_list_item = []
+        self.data = []
+
+        bar_list_1 = ["产品信息管理",["产品批次查询", "产品信息查询", "产品组件查询", "组件类型查询",  '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒']]
+        bar_list_2 = ["预防性维修保养管理",['维护方式管理', '维护记录管理']]
+        bar_list_3 = ["故障诊断与知识库管理", ['故障诊断与处理', '知识库管理']]
+        bar_list_4 = ["系统管理", ['业务管理', '用户管理']]
+        len1 = len(bar_list_1[1])
+        len2 = len(bar_list_2[1]) + len1
+        len3 = len(bar_list_3[1]) + len2
+        self.data = [0, len1, len2, len3]
+        bar_list_item.append(bar_list_1)
+        bar_list_item.append(bar_list_2)
+        bar_list_item.append(bar_list_3)
+        bar_list_item.append(bar_list_4)
+        return bar_list_item
+
+    def creat_main_layout(self):
+        self.main_layout = QHBoxLayout()
+        self.setLayout( self.main_layout)
+
+    def creat_bar_list(self, data):
+
+        for item in data:
+            item_1 =  QTreeWidgetItem( self. left_widget)
+            item_1.setText(0, item[0])
+            ##item_1.setText(0,item[0])
+            ## 设置节点的打开/关闭状态下的不同的图片
+            icon = QIcon()
+            ##节点打开状态
+            icon.addPixmap(QPixmap("./Images/"+ self.item_iamges[item[0]] +".png"), QIcon.Normal, QIcon.On)
+            item_1.setIcon(0, icon)
+
+            for item_item in item[1]:
+                item_1_1 =  QTreeWidgetItem( item_1);
+                icon = QIcon()
+                ##节点打开状态
+                icon.addPixmap(QPixmap("./Images/"+ self.item_iamges[item_item] +".png"), QIcon.Normal, QIcon.On)
+                item_1_1.setIcon(0, icon)
+                item_1_1.setText(0,item_item)
+            self. left_widget.addTopLevelItem(item_1);
+
+    def creat_bar_navigation(self):
+        self.item_iamges = {"产品批次查询": "batchsearch",
+                       "产品信息查询": "batchsearch",
+                       "产品组件查询": "batchsearch",
+                       "组件类型查询": "batchsearch",
+                       "产品入库": "产品入库",
+                       "产品出库": "产品出库",
+                       "产品出入库": "产品出入库",
+                       "维修保养": "维修保养",
+                       "产品交付登记": "维修记录",
+                       "产品库存": "产品出入库",
+                       "寿命到期提醒": "寿命到期提醒",
+                       "维护方式管理": "维修方式",
+                       "维护记录管理": "维修记录",
+                       "故障诊断与处理": "故障诊断",
+                       "知识库管理": "知识库管理",
+                       "业务管理": "业务管理",
+                       "用户管理": "用户管理",
+                       "产品信息管理": "1",
+                       "预防性维修保养管理": "维修保养",
+                       "故障诊断与知识库管理": "故障诊断",
+                       "系统管理": "用户管理",
+                       }
+        self. left_widget = QTreeWidget()
+        self.left_widget.setMinimumWidth(300)
+        self.left_widget.setHeaderLabel("左侧导航栏")
+        self.left_widget.setColumnCount(1)
+        self.left_widget.setMaximumWidth(150)
+        self.left_widget.setFocusPolicy(Qt.NoFocus)
+        # self.left_widget.setRootIsDecorated(False)
+
+        icon_size = QSize(20, 20)
+        self. left_widget.setIconSize(icon_size)
+
+        ##如果treewidget就一列，该列的宽度默认等于treewidget的宽度,两列以上的话才起作用.
+        ##self. left_widget.setColumnWidth(0,100);
+        data = self.get_bar_list()
+        self.creat_bar_list(data)
+        self.main_layout.addWidget(self. left_widget)
+        ## QModelIndex
+        ##self. left_widget.doubleClicked.connect(self.showModelSelected)
+        ## QTreeWidgetItem
+        # self. left_widget.itemDoubleClicked.connect(self.showSelected)
+        self. left_widget.itemClicked.connect(self.showSelected)
+
+
+    ## itemObj:QTreeWidgetItem
+    def showSelected(self, item, column):
+        # 获得父节点
+        parent = item.parent()
+
+        index_top = 0
+        index_row = -1
+
+        if parent is None:
+            index_top = self.left_widget.indexOfTopLevelItem(item)
+        else:
+            index_top = self.left_widget.indexOfTopLevelItem(parent)
+            index_row = parent.indexOfChild(item)
+
+
+        if index_row != -1:
+            self.display(self.data[index_top] + index_row)
+
+    def creat_left_box(self):
         self.right_widget = QStackedWidget(self)
         self.main_layout.addWidget(self.right_widget)
-        # 刷新查询批次界面
-        # self.table_thread = SearchProductBatchDetailThread()
-        # self.table_thread.update_date.connect(self.updateSearchProductBatchDetailWidget)
-        # self.table_thread.start()
-
         self.__setUpUI()
 
     def __setUpUI(self):
         """加载界面UI"""
-        # list和右边窗口的index对应绑定
-        self.left_widget.currentRowChanged.connect(self.display)
-        # 去掉边框
-        self.left_widget.setFrameShape(QListWidget.NoFrame)
-        # 隐藏滚动条
-        self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # # list和右边窗口的index对应绑定
+        # self.left_widget.currentRowChanged.connect(self.display)
+        # # 去掉边框
+        # self.left_widget.setFrameShape(QListWidget.NoFrame)
+        # # 隐藏滚动条
+        # self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        # self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒', '知识库管理', '维护方式管理', '维护记录管理', '故障诊断与处理', '业务管理', '用户管理']
+        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '业务管理', '用户管理']
         # 根据list_str设置对应UI
         url_list = ["self.setSearchBatchView",                  #1
                     "self.setSearchProductView",                #2
@@ -83,74 +191,20 @@ class AdminHome(QWidget):
                     "self.setProductDeliveryRegistration",      #8
                     "self.setProductInventory",
                     "self.setLifeReminder",
-                    "self.setKnowledgeBaseManageWidget",        #5
                     "self.setMaintenanceWayView",               #8
                     "self.setMaintenanceRecordView",            #9
                     "self.FaultDiagnosis",
+                    "self.setKnowledgeBaseManageWidget",        #5
                     "self.setFunctionManageView",
                     "self.setUserManageView" ]               #12
 
         for i in range(len(list_str)):
-            # 左侧选项的添加
-            self.item = QListWidgetItem(list_str[i], self.left_widget)
-            self.item.setSizeHint(QSize(30, 60))
-            self.item.setTextAlignment(Qt.AlignCenter)
+            # # 左侧选项的添加
+            # self.item = QListWidgetItem(list_str[i], self.left_widget)
+            # self.item.setSizeHint(QSize(30, 60))
+            # self.item.setTextAlignment(Qt.AlignCenter)
             # 根据对应函数设置右侧显示内容
             eval(url_list[i] + "()")
-
-    # def __setUpUI(self):
-    #     """加载界面UI"""
-    #     # list和右边窗口的index对应绑定
-    #     self.left_widget.currentRowChanged.connect(self.display)
-    #     # 去掉边框
-    #     self.left_widget.setFrameShape(QListWidget.NoFrame)
-    #     # 隐藏滚动条
-    #     self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    #     self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-    #
-    #     #list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '出库信息管理', '信息统计', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '用户管理']
-    #     list_str = list()
-    #     #链接数据库
-    #     db = openDB()
-    #     #查询出isvalid为true的项显示
-    #     q = QSqlQuery()
-    #     #当isvalid为false时，list对应窗口会出错
-    #     sql_code = "SELECT ChineseName FROM Admin_Menu WHERE IsValid = '%s'" % "true"
-    #     if q.exec_(sql_code):
-    #         while q.next():
-    #             string = q.value(0)
-    #             list_str.append(string)
-    #
-    #     #出现问题，很奇怪，list_str与url_list不对应
-    #     # 根据list_str设置对应UI
-    #     #url_list = ["self.setSearchBatchView", "self.setSearchProductView", "self.setSearchProductConponentView", "self.setSearchProductConponentTypeView", "self.setKnowledgeBaseManageWidget", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test", "self.test"]
-    #     url_list = ["self.setSearchBatchView",                  #1
-    #                 "self.setSearchProductView",                #2
-    #                 "self.setSearchProductConponentView",       #3
-    #                 "self.setSearchProductConponentTypeView",   #4
-    #                 "self.setOutInputDBTimes",                  #6
-    #                 "self.setMaintenance",                      #7
-    #                 "self.setProductDeliveryRegistration",      #8
-    #                 "self.setProductInventory",
-    #                 "self.setLifeReminder",
-    #                 "self.setKnowledgeBaseManageWidget",        #5
-    #                 "self.test",                                #6
-    #                 "self.test",                                #7
-    #                 "self.test",                                #8
-    #                 "self.test",                                #9
-    #                 "self.setUserManageView",                   #10
-    #                 "self.setKnowledgeBaseManageWidget",        #11
-    #                 "self.setFunctionManageView"]               #12
-    #     db.close()
-    #     for i in range(len(list_str)):
-    #         # 左侧选项的添加
-    #         self.item = QListWidgetItem(list_str[i], self.left_widget)
-    #         self.item.setSizeHint(QSize(30, 60))
-    #         self.item.setTextAlignment(Qt.AlignCenter)
-    #         # 根据对应函数设置右侧显示内容
-    #         #print(i)
-    #         #print(url_list[i] + "()")
-    #         eval(url_list[i] + "()")
 
 
     def display(self, i):
@@ -291,11 +345,13 @@ class AdminHome(QWidget):
 
 
 if __name__ == "__main__":
+
+    import sys
+
     app = QApplication(sys.argv)
     app.setWindowIcon(QIcon("./Images/MainWindow_1.png"))
     app.setStyleSheet(qdarkstyle.load_stylesheet_pyqt5())
-    mainMindow = AdminHome()
-    mainMindow.show()
+    window = AdminHome()
+    window.show()
+
     sys.exit(app.exec_())
-
-

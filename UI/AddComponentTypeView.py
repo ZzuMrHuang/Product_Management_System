@@ -190,6 +190,11 @@ class AddComponentTypeWidget(object):
         else:
             num = self.checkOn(ID, componentTypeName)
             if num == 0:
+                revert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % \
+                             (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[4], self.pre_list[6], self.pre_list[7])
+                self.query.exec(revert_sql)
+                self.db.commit()
+                self.dialog.close()
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -225,6 +230,7 @@ class AddComponentTypeWidget(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.titleLable.setText("修改组件类型")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))

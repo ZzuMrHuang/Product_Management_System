@@ -248,6 +248,12 @@ class AddMWWidget(object):
         else:
             num = self.checkOn(maintenanceWayID)
             if num == 0:
+                revert_sql = "insert into MaintenanceWay values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" \
+                      % (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[6],
+                         self.pre_list[7], self.pre_list[8], self.pre_list[9], self.pre_list[10])
+                self.query.exec(revert_sql)
+                self.db.commit()
+                self.dialog.close()
                 return
             # createTime = time.strftime("%Y-%m-%d %H:%M:%S")
             # insert_sql = "INSERT INTO MaintenanceWay VALUES ('%s', '%s', '%s', '%s', '%s'" \
@@ -365,6 +371,7 @@ class AddMWWidget(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.label.setText("修改维保方式信息")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))

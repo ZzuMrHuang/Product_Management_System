@@ -122,6 +122,11 @@ class AddKBMWidge(object):
         else:
             num = self.checkOn(Num)
             if num == 0:
+                revert_sql = "INSERT INTO T_Knowladge_Base_Mangement VALUES ('%s', '%s', '%s', '%s')" \
+                             % (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3])
+                self.query.exec(revert_sql)
+                self.db.commit()
+                self.dialog.close()
                 return
             insert_sql = "INSERT INTO T_Knowladge_Base_Mangement VALUES ('%s', '%s', '%s', '%s')" % (Num,Dataitem,Datatype, remark)
             self.query.exec(insert_sql)
@@ -186,6 +191,7 @@ class AddKBMWidge(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.label.setText("修改知识分类")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))

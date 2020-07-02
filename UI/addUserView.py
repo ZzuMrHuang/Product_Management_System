@@ -166,20 +166,20 @@ class AddUserWidget(object):
         :param queryModel:
         :return:
         """
-        result = queryModel.getData()
-        checked_list = queryModel.checkList
-        #找到被选择的行数
-        number = -1
-        for i in range(len(checked_list)):
-            if checked_list[i] == "Checked":
-                number = i
-        #在此行被删除前先保存下来原本的信息，如果出现check异常则再次把这些数据存入数据库
-        list = result[number]
-        pre_userID = list[0]
-        pre_psw = list[1]
-        pre_rightID = list[2]
-        pre_changeDate = list[3]
-        pre_changerId = list[4]
+        # result = queryModel.getData()
+        # checked_list = queryModel.checkList
+        # #找到被选择的行数
+        # number = -1
+        # for i in range(len(checked_list)):
+        #     if checked_list[i] == "Checked":
+        #         number = i
+        # #在此行被删除前先保存下来原本的信息，如果出现check异常则再次把这些数据存入数据库
+        # list = result[number]
+        # pre_userID = list[0]
+        # pre_psw = list[1]
+        # pre_rightID = list[2]
+        # pre_changeDate = list[3]
+        # pre_changerId = list[4]
         #第一次点击出错后，修改数据正确后，后再保存会删除下一行
         #解决方案，在第一次出错后直接关闭dialog
         queryModel.delete()
@@ -201,9 +201,9 @@ class AddUserWidget(object):
         else:
             num = self.checkOn(userID,rightID)
             if num == 0:
-                insert_sql = "INSERT INTO User VALUES ('%s','%s', '%s', '%s','%s')" % \
-                             (pre_userID, pre_psw, pre_rightID, pre_changeDate, pre_changerId)
-                self.query.exec(insert_sql)
+                revert_sql = "INSERT INTO User VALUES ('%s','%s', '%s', '%s','%s')" % \
+                             (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4])
+                self.query.exec(revert_sql)
                 self.db.commit()
                 self.dialog.close()
                 return
@@ -243,6 +243,7 @@ class AddUserWidget(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.label.setText("修改用户信息")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda:self.updateButtonEvent(queryModel))

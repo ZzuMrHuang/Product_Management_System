@@ -235,6 +235,12 @@ class AddMRWidget(object):
         else:
             num = self.checkOn(mrID)
             if num == 0:
+                revert_sql = "insert into MaintenanceRecord values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" \
+                % (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6],
+                   self.pre_list[7], self.pre_list[8], self.pre_list[9], self.pre_list[10], self.pre_list[11], self.pre_list[12])
+                self.query.exec(revert_sql)
+                self.db.commit()
+                self.dialog.close()
                 return
             # import time
             # createTime = time.strftime("%Y-%m-%d %H:%M:%S")
@@ -361,6 +367,7 @@ class AddMRWidget(object):
         :param list:
         :return:
         """
+        self.pre_list = list
         self.label.setText("修改产品信息")
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda: self.updateButtonEvent(queryModel))
