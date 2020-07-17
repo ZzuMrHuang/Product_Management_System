@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont
 from PyQt5.QtCore import *
 import qdarkstyle
+
+from Login_recorder import update_currentLoginState
 from SignIn import SignInWidget
 from SignUp import SignUpWidget
 import sip
@@ -19,7 +21,7 @@ class Main(QMainWindow):
 
         #self.resize(900, 600)
 
-        self.setWindowTitle("产品管理系统")
+        self.setWindowTitle("决策支持系统")
         self.setCentralWidget(self.widget)
         bar = self.menuBar()
         self.Menu = bar.addMenu("菜单栏")
@@ -111,6 +113,7 @@ class Main(QMainWindow):
             self.signInAction.setEnabled(False)
             self.quitSignInAction.setEnabled(False)
         if (q.text() == "退出系统"):
+            update_currentLoginState()
             qApp = QApplication.instance()
             qApp.quit()
         return

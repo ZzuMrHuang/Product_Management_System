@@ -168,6 +168,8 @@ class AddInStorage(object):
         ok_button.setText("提交")
         # 提交的槽函数
         ok_button.clicked.connect(self.ok_fun)
+        # 取消的槽函数
+        cancel_button.clicked.connect(self.cancel_fun)
         # 设置ProductNO的完成编辑信号和获取数据库中出库编号的槽函数
         self.productNO.editingFinished.connect(self.getOutNO)
 
@@ -197,7 +199,7 @@ class AddInStorage(object):
                 max_no = q.value(0)
         db.close()
         if date_str > max_no[0:8]:
-            return date_str + '001'
+            return date_str + '101'
         else:
             return str(int(max_no) + 1)
 
@@ -206,26 +208,43 @@ class AddInStorage(object):
     def ok_fun(self):
         db = openDB()
         q = QSqlQuery()
-        insert_sql = "INSERT INTO T_IN_Base(InNO, OUTNO, INDATE, INRECODER, CREATEID, CREATETIME, UPDATEID, " \
-                     "UPDATETIME, REMARK) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % \
-                     (self.inNO.text(), self.outNO.text(), self.inDate.text(),
-                      self.inRecorderPerson.text(), 1, self.createTime.text(),
-                      0, self.createTime.text(), self.remark.toPlainText())
-        q.exec(insert_sql)
-        db.commit()
-        insert_sql = "INSERT INTO T_In_Detail(InNO,ProductNO, InStorageNO, InRecorderID, InTechState, IsUsed, " \
-                     "CreateID, " \
-                     "CreateTime, UpdateID, UpdateTime, Remark)VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s'," \
-                     "'%s','%s')" % \
-                     (self.inNO.text(), self.productNO.text(), self.inStorageNo.text(), 0,
-                      self.inTechState.text(), self.isUsed.currentText(), 1, self.createTime.text(),
-                      0, self.createTime.text(), self.remark.toPlainText())
-        q.exec(insert_sql)
-        db.commit()
-        db.close()
-        confirm = QMessageBox.information(QDialog(), "提示", "入库信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
-        if confirm == QMessageBox.Yes:
-            self.dialog.close()
+        # 判断所有值均不为空
+        if all([self.inNO.text(),
+                self.outNO.text(),
+                self.inDate.text(),
+                self.inRecorderPerson.text(),
+                self.createTime.text(),
+                self.remark.toPlainText(),
+                self.productNO.text(),
+                self.inStorageNo.text(),
+                self.inTechState.text(),
+                self.isUsed.currentText(),
+                self.createTime.text()]):
+            insert_sql = "INSERT INTO T_IN_Base(InNO, OUTNO, INDATE, INRECODER, CREATEID, CREATETIME, UPDATEID, " \
+                         "UPDATETIME, REMARK) VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % \
+                         (self.inNO.text(), self.outNO.text(), self.inDate.text(),
+                          self.inRecorderPerson.text(), 1, self.createTime.text(),
+                          0, self.createTime.text(), self.remark.toPlainText())
+            q.exec(insert_sql)
+            db.commit()
+            insert_sql = "INSERT INTO T_In_Detail(InNO,ProductNO, InStorageNO, InRecorderID, InTechState, IsUsed, " \
+                         "CreateID, " \
+                         "CreateTime, UpdateID, UpdateTime, Remark)VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s'," \
+                         "'%s','%s')" % \
+                         (self.inNO.text(), self.productNO.text(), self.inStorageNo.text(), 0,
+                          self.inTechState.text(), self.isUsed.currentText(), 1, self.createTime.text(),
+                          0, self.createTime.text(), self.remark.toPlainText())
+            q.exec(insert_sql)
+            db.commit()
+            db.close()
+            confirm = QMessageBox.information(QDialog(), "提示", "入库信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if confirm == QMessageBox.Yes:
+                self.dialog.close()
+        else:
+            QMessageBox.information(QDialog(), "错误", "输入值不能为空,请重新检查输入！", QMessageBox.Yes, QMessageBox.Yes)
+
+    def cancel_fun(self):
+        self.dialog.close()
 
 
 if __name__ == "__main__":

@@ -134,6 +134,7 @@ class OutStorageWidget(MySearchWidget):
         headerRow = ["ID", "出库编号", "产品编号", "出库库房", "技术状态", "是否交还", "创建ID", "创建时间", "更新ID", "更新时间", "备注"]
         self.tableView.setModel(self.queryModel)
         self.queryModel = MySearchTableModel("T_Out_Detail", headerRow)
+        self.queryModel = MySearchTableModel("T_Out_Detail", headerRow)
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()
         self.tableView.setHorizontalHeader(self.header)
@@ -194,7 +195,7 @@ class OutStorageWidget(MySearchWidget):
 
     def deleteButtonEvent(self):
         """
-        hsj 删除批次按钮绑定事件
+        hsj 删除按钮绑定事件
         :return:
         """
         # print(self.queryModel.checkList.count("Checked"))

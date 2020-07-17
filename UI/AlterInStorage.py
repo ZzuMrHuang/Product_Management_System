@@ -178,6 +178,7 @@ class AlterInStorage(object):
         cancel_button.setText("取消")
         ok_button.setText("修改")
         ok_button.clicked.connect(self.ok_fun)
+        cancel_button.clicked.connect(self.cancel_fun)
 
     def updateData(self, list, queryModel):
         """
@@ -186,19 +187,19 @@ class AlterInStorage(object):
         :return:
         """
         self.label.setText("修改入库信息")
-
-        self.productNO.setText(list[0])
-        self.inStorageNo.setText(list[1])
-        self.inRecorderID.setText(list[2])
-        self.inTechState.setText(list[3])
-        self.isUsed.setEditText(list[4])
-        # self.createTime.setDateTime(datetime.strptime(list[6], "%Y-%m-%d %H:%M:%S"))
-        # self.createTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
-        self.updateID.setText(list[7])
+        self.productNO.setText(list[1])
+        self.inStorageNo.setText(list[2])
+        self.inRecorderID.setText(list[3])
+        self.inTechState.setText(list[4])
+        self.isUsed.setEditText(list[5])
+        self.createTime.setDateTime(datetime.strptime(list[7], "%Y-%m-%d %H:%M:%S"))
+        self.createTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.updateID.setText(list[8])
         self.updateTime.setDateTime(QDateTime.currentDateTime())
         self.updateTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
-        self.remark.setText(list[9])
-        self.inNO.setText(str(list[10]))
+        self.remark.setText(list[10])
+        self.inNO.setText(str(list[11]))
+        print(self.updateID.text())
         db = openDB()
         query = QSqlQuery()
         sql = "SELECT * FROM T_In_Base where InNO=%s" % self.inNO.text()
@@ -211,25 +212,48 @@ class AlterInStorage(object):
             db.close()
 
     def ok_fun(self):
-        db = openDB()
-        q = QSqlQuery()
-        sql = "UPDATE T_In_Base SET  OutNO='%s', InRecoder='%s', CreateTime='%s', " \
-              "UpdateID='%s', UpdateTime='%s', Remark='%s'WHERE OutNO='%s'" \
-              % (self.outNO.text(), self.inRecorderPerson.text(), self.createTime.text(),
-                 self.updateID.text(), self.updateTime.text(),
-                 self.remark.toPlainText(), self.inNO.text())
-        q.exec(sql)
-        db.commit()
-        sql = "UPDATE T_In_Detail SET ProductNO='%s', InStorageNO='%s', InRecorderID='%s', InTechState='%s', " \
-              "IsUsed='%s', createtime='%s', UpdateID='%s', updatetime='%s', remark='%s'" \
-              "WHERE InNO='%s'" \
-              % (self.productNO.text(), self.inStorageNo.text(), self.inRecorderID.text(),
-                 self.inTechState.text(), self.isUsed.currentText(), self.createTime.text(),
-                 self.updateID.text(), self.updateTime.text(), self.remark.toPlainText(),
-                 self.inNO.text())
-        q.exec(sql)
-        db.commit()
-        db.close()
-        confirm = QMessageBox.information(QDialog(), "提示", "入库信息修改成功！", QMessageBox.Yes, QMessageBox.Yes)
-        if confirm == QMessageBox.Yes:
-            self.dialog.close()
+        verify_values = [self.inNO.text(),
+                         self.inRecorderID.text(),
+                         self.outNO.text(),
+                         self.inDate.text(),
+                         self.inRecorderPerson.text(),
+                         self.remark.toPlainText(),
+                         self.productNO.text(),
+                         self.inStorageNo.text(),
+                         self.inTechState.text(),
+                         self.isUsed.currentText(),
+                         self.createTime.text(),
+                         self.updateTime.text(),
+                         self.updateID.text()]
+        flag = True
+        for value in verify_values:
+            if value == ' ' or value == '0' or value == '':
+                flag = False
+                QMessageBox.information(QDialog(), "错误", "输入值不能为空,请重新检查输入！", QMessageBox.No, QMessageBox.No)
+        if flag:
+            print("in:", self.inRecorderID.text())
+            db = openDB()
+            q = QSqlQuery()
+            sql = "UPDATE T_In_Base SET  OutNO='%s', InRecoder='%s', CreateTime='%s', " \
+                  "UpdateID='%s', UpdateTime='%s', Remark='%s'WHERE OutNO='%s'" \
+                  % (self.outNO.text(), self.inRecorderPerson.text(), self.createTime.text(),
+                     self.updateID.text(), self.updateTime.text(),
+                     self.remark.toPlainText(), self.inNO.text())
+            q.exec(sql)
+            db.commit()
+            sql = "UPDATE T_In_Detail SET ProductNO='%s', InStorageNO='%s', InRecorderID='%s', InTechState='%s', " \
+                  "IsUsed='%s', createtime='%s', UpdateID='%s', updatetime='%s', remark='%s'" \
+                  "WHERE InNO='%s'" \
+                  % (self.productNO.text(), self.inStorageNo.text(), self.inRecorderID.text(),
+                     self.inTechState.text(), self.isUsed.currentText(), self.createTime.text(),
+                     self.updateID.text(), self.updateTime.text(), self.remark.toPlainText(),
+                     self.inNO.text())
+            q.exec(sql)
+            db.commit()
+            db.close()
+            confirm = QMessageBox.information(QDialog(), "提示", "入库信息修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if confirm == QMessageBox.Yes:
+                self.dialog.close()
+
+    def cancel_fun(self):
+        self.dialog.close()

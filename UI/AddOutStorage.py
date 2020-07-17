@@ -83,10 +83,10 @@ class Ui_Dialog(object):
         self.Label_3 = QtWidgets.QLabel(Dialog)
         self.Label_3.setObjectName("Label_3")
         self.formLayout.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.Label_3)
-        self.inRecorderPerson = QtWidgets.QLineEdit(Dialog)
-        self.inRecorderPerson.setEnabled(True)
-        self.inRecorderPerson.setObjectName("inRecorderPerson")
-        self.formLayout.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.inRecorderPerson)
+        self.outRecorderPerson = QtWidgets.QLineEdit(Dialog)
+        self.outRecorderPerson.setEnabled(True)
+        self.outRecorderPerson.setObjectName("outRecorderPerson")
+        self.formLayout.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.outRecorderPerson)
         self.Label_4 = QtWidgets.QLabel(Dialog)
         self.Label_4.setObjectName("Label_4")
         self.formLayout.setWidget(8, QtWidgets.QFormLayout.LabelRole, self.Label_4)
@@ -155,8 +155,8 @@ class Ui_Dialog(object):
         self.Label_4.setText(_translate("Dialog", "技术状态:"))
         self.Label_13.setText(_translate("Dialog", "创建时间:"))
         self.Label_12.setText(_translate("Dialog", "备       注："))
-        self.isReturn.setItemText(0, _translate("Dialog", "是"))
-        self.isReturn.setItemText(1, _translate("Dialog", "否"))
+        self.isReturn.setItemText(0, _translate("Dialog", "否"))
+        self.isReturn.setItemText(1, _translate("Dialog", "是"))
         self.label_5.setText(_translate("Dialog", "使  用  人:"))
         self.label_6.setText(_translate("Dialog", "出库原因"))
         self.createTime.setDateTime(QDateTime.currentDateTime())
@@ -173,22 +173,8 @@ class Ui_Dialog(object):
         ok_button.setText("提交")
         # 提交的槽函数
         ok_button.clicked.connect(self.ok_fun)
-
-    # def setWidgetProperty(self):
-    #     self.createTime.setDateTime(QDateTime.currentDateTime())
-    #     # 设置出库日期
-    #     self.outDate.setDateTime(QDateTime.currentDateTime())
-    #     # 设置出库编号(日期+三位流水号)
-    #     self.outNO.setText(self.getOutNO())
-    #     # 提交和取消按钮点击事件
-    #     cancel_button = self.buttonBox.button(QDialogButtonBox.Cancel)
-    #     ok_button = self.buttonBox.button(QDialogButtonBox.Ok)
-    #     cancel_button.setText("取消")
-    #     ok_button.setText("提交")
-    #     # 提交的槽函数
-    #     ok_button.clicked.connect(self.ok_fun)
-
-    # 获取出库编号
+        # 取消的槽函数
+        cancel_button.clicked.connect(self.cancel_fun)
 
     def getOutNO(self):
         max_no = ''
@@ -205,32 +191,49 @@ class Ui_Dialog(object):
         else:
             return str(int(max_no) + 1)
 
-        # 处理提交事件
-
+    # 处理提交事件
     def ok_fun(self):
-        db = openDB()
-        q = QSqlQuery()
-        insert_sql = "INSERT INTO T_Out_Base(outno, outdate, usedid, useddepartmentid, recorderid, outreason, " \
-                     "createid, createtime, updateid, updatetime, remark) VALUES ('%s','%s','%s','%s','%s','%s','%s'," \
-                     "'%s','%s','%s','%s')" % \
-                     (self.outNO.text(), self.outDate.text(), self.usedID.text(),
-                      self.usedDepartmentNO.text(), self.inRecorderPerson.text(), self.outReason.text(),
-                      self.outNO.text(), self.createTime.text(),
-                      0, self.createTime.text(), self.remark.toPlainText())
-        q.exec(insert_sql)
-        db.commit()
-        insert_sql = "INSERT INTO T_Out_Detail(outno, productno, outstorageno, outtechstate, isreturn, createid, " \
-                     "createtime, updateid, updatetime, remark)VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s'," \
-                     "'%s')" % \
-                     (self.outNO.text(), self.productNO.text(), self.outStorageNo.text(),
-                      self.outTechState.text(), self.isReturn.currentText(), 1, self.createTime.text(),
-                      0, self.createTime.text(), self.remark.toPlainText())
-        q.exec(insert_sql)
-        db.commit()
-        db.close()
-        confirm = QMessageBox.information(QDialog(), "提示", "出库信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
-        if confirm == QMessageBox.Yes:
-            self.dialog.close()
+        if all([self.outNO.text(),
+                self.outDate.text(),
+                self.usedID.text(),
+                self.usedDepartmentNO.text(),
+                self.outRecorderPerson.text(),
+                self.outReason.text(),
+                self.createTime.text(),
+                self.remark.toPlainText(),
+                self.productNO.text(),
+                self.outStorageNo.text(),
+                self.outTechState.text(),
+                self.isReturn.currentText(),
+                self.createTime.text(),
+                self.remark.toPlainText()]):
+            db = openDB()
+            q = QSqlQuery()
+            insert_sql = "INSERT INTO T_Out_Base(outno, outdate, usedid, useddepartmentid, recorderid, outreason, " \
+                         "createid, createtime, updateid, updatetime, remark) VALUES ('%s','%s','%s','%s','%s','%s'," \
+                         "'%s','%s','%s','%s','%s')" % \
+                         (self.outNO.text(), self.outDate.text(), self.usedID.text(),
+                          self.usedDepartmentNO.text(), self.outRecorderPerson.text(), self.outReason.text(),
+                          1, self.createTime.text(), 0, self.createTime.text(), self.remark.toPlainText())
+            q.exec(insert_sql)
+            db.commit()
+            insert_sql = "INSERT INTO T_Out_Detail(outno, productno, outstorageno, outtechstate, isreturn, createid, " \
+                         "createtime, updateid, updatetime, remark)VALUES ('%s','%s','%s','%s','%s','%s','%s','%s'," \
+                         "'%s','%s')" % \
+                         (self.outNO.text(), self.productNO.text(), self.outStorageNo.text(),
+                          self.outTechState.text(), self.isReturn.currentText(), 1, self.createTime.text(),
+                          0, self.createTime.text(), self.remark.toPlainText())
+            q.exec(insert_sql)
+            db.commit()
+            db.close()
+            confirm = QMessageBox.information(QDialog(), "提示", "出库信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if confirm == QMessageBox.Yes:
+                self.dialog.close()
+        else:
+            QMessageBox.information(QDialog(), "错误", "输入值不能为空,请重新检查输入！", QMessageBox.Yes, QMessageBox.Yes)
+
+    def cancel_fun(self):
+        self.dialog.close()
 
 
 if __name__ == "__main__":

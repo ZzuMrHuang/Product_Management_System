@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
+from Login_recorder import getCurrentUserId
 from Utils import openDB
 
 
@@ -105,6 +106,9 @@ class AddComponentTypeWidget(object):
         self.updateTime.setEnabled(False)
         self.updateID.setEnabled(False)
 
+        self.disPlayOrder.setVisible(False)
+        self.disPlayOrderLabel.setVisible(False)
+
         self.retranslateUi(Dialog)
         self.bindButton(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
@@ -146,6 +150,7 @@ class AddComponentTypeWidget(object):
         componentTypeName = self.componentTypeName.text()
         displayOrder = self.disPlayOrder.text()
         remark = self.remark.toPlainText()
+        createID = getCurrentUserId()
 
         # 如果必要的信息都不为空
         if componentTypeName == "" or displayOrder == "" or ID == "" or displayOrder == "":
@@ -157,8 +162,9 @@ class AddComponentTypeWidget(object):
                 return
             import time
             createTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (ID, componentTypeName, displayOrder, createTime, createTime, remark)
+            insert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '%s', '--', '--', '%s')" % (ID, componentTypeName, createID, createTime, remark)
             self.query.exec(insert_sql)
+            # print(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "组件类型新建成功！", QMessageBox.Yes, QMessageBox.Yes)
             if confirm == QMessageBox.Yes:
@@ -183,6 +189,8 @@ class AddComponentTypeWidget(object):
         displayOrder = self.disPlayOrder.text()
         remark = self.remark.toPlainText()
         createTime = self.createTime.text()
+        createID = self.createID.text()
+        updateID = getCurrentUserId()
         # 如果必要的信息都不为空
         if componentTypeName == "" or displayOrder == "" or ID == "" or displayOrder == "":
             print(QMessageBox.warning(QDialog(), "警告", "有字段为空，添加失败！", QMessageBox.Yes, QMessageBox.Yes))
@@ -190,15 +198,15 @@ class AddComponentTypeWidget(object):
         else:
             num = self.checkOn(ID, componentTypeName)
             if num == 0:
-                revert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % \
-                             (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[4], self.pre_list[6], self.pre_list[7])
+                revert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % \
+                             (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6], self.pre_list[7])
                 self.query.exec(revert_sql)
                 self.db.commit()
                 self.dialog.close()
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (ID, componentTypeName, displayOrder, createTime, updateTime, remark)
+            insert_sql = "INSERT INTO T_Product_ComponentType VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (ID, componentTypeName, displayOrder, createID, createTime, updateID, updateTime, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "组件类型更改成功！", QMessageBox.Yes, QMessageBox.Yes)

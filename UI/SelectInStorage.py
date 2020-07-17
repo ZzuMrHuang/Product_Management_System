@@ -5,10 +5,9 @@
 # Created by: PyQt5 UI code generator 5.14.2
 #
 # WARNING! All changes made in this file will be lost!
-
+from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDateTime
 from PyQt5.QtSql import QSqlQuery
 
 from Utils import openDB
@@ -123,6 +122,7 @@ class SelectINStorage(object):
         self.updateTime = QtWidgets.QDateTimeEdit(Dialog)
         self.updateTime.setEnabled(False)
         self.updateTime.setObjectName("updateTime")
+        self.updateTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.formLayout.setWidget(10, QtWidgets.QFormLayout.FieldRole, self.updateTime)
         self.label_8 = QtWidgets.QLabel(Dialog)
         self.label_8.setObjectName("label_8")
@@ -168,19 +168,15 @@ class SelectINStorage(object):
         self.Label_12.setText(_translate("Dialog", "备       注："))
 
     def setData(self, list):
-        """
-        hsj 设置单个产品查询结果
-        :param list: 单个查询结果
-        :return:
-        """
         self.ID.setText(list[0])
         self.productNO.setText(list[1])
         self.inStorageNo.setText(list[2])
         self.inTechState.setText(list[4])
         self.isUsed.setEditText(list[5])
-        self.createTime.setDateTime(QDateTime.fromString(list[7]))
+        self.createTime.setDateTime(datetime.strptime(list[7], "%Y-%m-%d %H:%M:%S"))
+        self.createTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.updateID.setText(list[8])
-        self.updateTime.setDateTime(QDateTime.fromString(list[9]))
+        self.updateTime.setDateTime(datetime.strptime(list[9], "%Y-%m-%d %H:%M:%S"))
         self.remark.setText(list[10])
         db = openDB()
         query = QSqlQuery()
@@ -189,6 +185,7 @@ class SelectINStorage(object):
         if query.next():
             self.inNO.setText(query.value(1))
             self.outNO.setText(query.value(2))
-            self.inDate.setDateTime(QDateTime.fromString(query.value(3)))
+            self.inDate.setDate(datetime.strptime(query.value(3), "%Y-%m-%d"))
+            self.inDate.setDisplayFormat("yyyy-MM-dd")
             self.inRecorderPerson.setText(query.value(4))
         db.close()

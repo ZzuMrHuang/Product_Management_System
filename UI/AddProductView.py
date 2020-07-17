@@ -12,6 +12,7 @@ from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
+from Login_recorder import getCurrentUserId
 from Utils import openDB
 
 
@@ -46,18 +47,7 @@ class AddProductWidget(object):
         self.productNO = QtWidgets.QLineEdit(Dialog)
         self.productNO.setObjectName("productNO")
         self.formLayout.setWidget(0, QtWidgets.QFormLayout.FieldRole, self.productNO)
-        self.iDLabel = QtWidgets.QLabel(Dialog)
-        self.iDLabel.setObjectName("iDLabel")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.iDLabel)
-        self.ID = QtWidgets.QLineEdit(Dialog)
-        self.ID.setObjectName("ID")
-        self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.ID)
-        self.productModelIDLabel = QtWidgets.QLabel(Dialog)
-        self.productModelIDLabel.setObjectName("productModelIDLabel")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.LabelRole, self.productModelIDLabel)
-        self.productModelID = QtWidgets.QLineEdit(Dialog)
-        self.productModelID.setObjectName("productModelID")
-        self.formLayout.setWidget(2, QtWidgets.QFormLayout.FieldRole, self.productModelID)
+
         self.Label_2 = QtWidgets.QLabel(Dialog)
         self.Label_2.setObjectName("Label_2")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.LabelRole, self.Label_2)
@@ -156,8 +146,6 @@ class AddProductWidget(object):
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label.setText(_translate("Dialog", "新建产品"))
         self.Label.setText(_translate("Dialog", "产品编号:"))
-        self.iDLabel.setText(_translate("Dialog", "ID："))
-        self.productModelIDLabel.setText(_translate("Dialog", "ProductModelID："))
         self.Label_2.setText(_translate("Dialog", "寿命(天)："))
         self.Label_3.setText(_translate("Dialog", "寿命起始日期："))
         self.Label_4.setText(_translate("Dialog", "距到期提醒(天)："))
@@ -192,15 +180,13 @@ class AddProductWidget(object):
         :return:
         """
         productNO = self.productNO.text()
-        ID = self.ID.text()
-        ProductModelID = self.productModelID.text()
         life = self.life.text()
         startDate = self.startDate.text()
         daysBefore = self.daysbefore.text()
         isUsedCountLimit = self.isUsedCountLimit.text()
         maxUsedCount = self.maxUsedCount.text()
         haveUsedCount = self.maxUsedCount.text()
-        createID = self.createID.text()
+        createID = getCurrentUserId()
         createTime = self.createTime.text()
         updateID = self.createID.text()
         updateTime = self.updateTime.text()
@@ -216,7 +202,7 @@ class AddProductWidget(object):
                 return
             import time
             createTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product VALUES ('%s', '--', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (productNO, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createTime, createTime, remark)
+            insert_sql = "INSERT INTO T_Product VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '--', '--', '%s')" % (productNO, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createID, createTime,  remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "产品新建成功！", QMessageBox.Yes, QMessageBox.Yes)
@@ -238,8 +224,6 @@ class AddProductWidget(object):
         """
         queryModel.delete()
         productNO = self.productNO.text()
-        ID = self.ID.text()
-        ProductModelID = self.productModelID.text()
         life = self.life.text()
         startDate = self.startDate.text()
         daysBefore = self.daysbefore.text()
@@ -259,14 +243,15 @@ class AddProductWidget(object):
         else:
             num = self.checkOn(productNO)
             if num == 0:
-                revert_sql = "INSERT INTO T_Product VALUES ('%s', '--', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" \
-                             % (self.pre_list[0], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6], self.pre_list[7], self.pre_list[8], self.pre_list[10], self.pre_list[12], self.pre_list[13])
+                revert_sql = "INSERT INTO T_Product VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" \
+                             % (self.pre_list[0], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6], self.pre_list[7], self.pre_list[8], self.pre_list[9], self.pre_list[10], self.pre_list[11], self.pre_list[12], self.pre_list[13])
                 self.query.exec(revert_sql)
                 self.db.commit()
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product VALUES ('%s', '--', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (productNO, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createTime, updateTime, remark)
+            insert_sql = "INSERT INTO T_Product VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" %\
+                         (productNO, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createID,createTime, updateID, updateTime, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "产品更改成功！", QMessageBox.Yes, QMessageBox.Yes)
@@ -298,17 +283,33 @@ class AddProductWidget(object):
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))
         self.productNO.setText(list[0])
-        self.ID.setText(list[1])
-        self.productModelID.setText(list[2])
-        self.life.setText(list[3])
-        # self.startDate.setText(list[4])
-        self.daysbefore.setText(list[5])
-        self.isUsedCountLimit.setText(list[6])
-        self.maxUsedCount.setText(list[7])
-        self.maxUsedCount.setText(list[8])
+        self.life.setText(list[1])
+        # self.startDate.set
+        self.daysbefore.setText(list[3])
+        self.isUsedCountLimit.setText(list[4])
+        self.maxUsedCount.setText(list[5])
+        self.havaUsedCount.setText(list[6])
+        self.createID.setText(list[7])
+        self.createTime.setText(list[8])
         self.createID.setText(list[9])
-        self.createTime.setText(list[10])
-        self.createID.setText(list[11])
-        self.updateTime.setText(list[12])
-        self.remark.setText(list[13])
+        self.updateTime.setText(list[10])
+        self.remark.setText(list[11])
 
+    def showData(self, list, queryModel):
+        self.updateData(list, queryModel)
+        self.label.setText("详细产品信息")
+        self.productNO.setDisabled(True)
+        self.life.setDisabled(True)
+        self.startDate.setDisabled(True)
+        self.daysbefore.setDisabled(True)
+        self.isUsedCountLimit.setDisabled(True)
+        self.maxUsedCount.setDisabled(True)
+        self.havaUsedCount.setDisabled(True)
+        self.createID.setDisabled(True)
+        self.createTime.setDisabled(True)
+        self.createID.setDisabled(True)
+        self.updateTime.setDisabled(True)
+        self.remark.setDisabled(True)
+
+        self.conserveButton.setVisible(False)
+        self.cancelButton.setVisible(False)

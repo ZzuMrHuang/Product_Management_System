@@ -17,6 +17,7 @@ from FaultDiagnosis import FaultDiagnosis
 from FunctionManageView import FunctionManageWidget
 from InStorageView import InStorageWidget
 from LifeReminder import LifeReminder
+from LnfoManageView import LnfoManageWidget
 from MR_SearchMRView import SelectMRWidget
 from Maintenance import Maintenance
 from OutInputDBTimes import OutInputDBTimes
@@ -63,7 +64,7 @@ class AdminHome(QWidget):
         bar_list_1 = ["产品信息管理",["产品批次查询", "产品信息查询", "产品组件查询", "组件类型查询",  '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒']]
         bar_list_2 = ["预防性维修保养管理",['维护方式管理', '维护记录管理']]
         bar_list_3 = ["故障诊断与知识库管理", ['故障诊断与处理', '知识库管理']]
-        bar_list_4 = ["系统管理", ['业务管理', '用户管理']]
+        bar_list_4 = ["系统管理", ['业务管理', '用户管理', '日志管理']]
         len1 = len(bar_list_1[1])
         len2 = len(bar_list_2[1]) + len1
         len3 = len(bar_list_3[1]) + len2
@@ -121,6 +122,7 @@ class AdminHome(QWidget):
                        "预防性维修保养管理": "维修保养",
                        "故障诊断与知识库管理": "故障诊断",
                        "系统管理": "用户管理",
+                       "日志管理": "用户管理"
                        }
         self. left_widget = QTreeWidget()
         self.left_widget.setMinimumWidth(300)
@@ -137,7 +139,7 @@ class AdminHome(QWidget):
         ##self. left_widget.setColumnWidth(0,100);
         data = self.get_bar_list()
         self.creat_bar_list(data)
-        self.main_layout.addWidget(self. left_widget)
+        self.main_layout.addWidget(self.left_widget)
         ## QModelIndex
         ##self. left_widget.doubleClicked.connect(self.showModelSelected)
         ## QTreeWidgetItem
@@ -178,7 +180,7 @@ class AdminHome(QWidget):
         # self.left_widget.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         # self.left_widget.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
-        list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '业务管理', '用户管理']
+        # list_str = ['产品批次查询', '产品信息新建', '产品组件查询', '组件类型查询', '产品入库', '产品出库', '产品出入库', '维修保养', '产品交付登记', '产品库存', '寿命到期提醒', '维护方式管理', '维护记录管理', '故障诊断与处理', '知识库管理', '业务管理', '用户管理']
         # 根据list_str设置对应UI
         url_list = ["self.setSearchBatchView",                  #1
                     "self.setSearchProductView",                #2
@@ -196,9 +198,10 @@ class AdminHome(QWidget):
                     "self.FaultDiagnosis",
                     "self.setKnowledgeBaseManageWidget",        #5
                     "self.setFunctionManageView",
-                    "self.setUserManageView" ]               #12
+                    "self.setUserManageView",
+                    "self.setLnfoManageView"]               #12
 
-        for i in range(len(list_str)):
+        for i in range(len(url_list)):
             # # 左侧选项的添加
             # self.item = QListWidgetItem(list_str[i], self.left_widget)
             # self.item.setSizeHint(QSize(30, 60))
@@ -340,8 +343,9 @@ class AdminHome(QWidget):
         print("设置故障诊断界面")
 
 
-    def test(self):
-        pass
+    def setLnfoManageView(self):
+        self.z = LnfoManageWidget()
+        self.setRightWidget1(self.z)
 
 
 if __name__ == "__main__":

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>792</width>
-    <height>779</height>
+    <width>770</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="font">
@@ -64,7 +64,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="BatchNO"/>
+      <widget class="QLineEdit" name="batchNO"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="iDLabel">
@@ -74,127 +74,121 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="ProductID"/>
+      <widget class="QLineEdit" name="productID"/>
      </item>
      <item row="2" column="0">
-      <widget class="QLabel" name="Label_2">
-       <property name="text">
-        <string>登记人：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="recorder"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="Label_3">
-       <property name="text">
-        <string>登记日期：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="recordDate"/>
-     </item>
-     <item row="4" column="0">
       <widget class="QLabel" name="Label_4">
        <property name="text">
         <string>交付单位:</string>
        </property>
       </widget>
      </item>
-     <item row="4" column="1">
+     <item row="2" column="1">
       <widget class="QLineEdit" name="deliverCompany"/>
      </item>
-     <item row="5" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="Label_5">
        <property name="text">
         <string>交付人员：</string>
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="3" column="1">
       <widget class="QLineEdit" name="deliverer"/>
      </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="Label_6">
-       <property name="text">
-        <string>接收单位：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLineEdit" name="receiveCompany"/>
-     </item>
-     <item row="8" column="0">
-      <widget class="QLabel" name="Label_7">
-       <property name="text">
-        <string>接收人员：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QLineEdit" name="receiver"/>
-     </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="Label_8">
-       <property name="text">
-        <string>创建人员：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QLineEdit" name="createID"/>
-     </item>
-     <item row="10" column="0">
-      <widget class="QLabel" name="Label_9">
-       <property name="text">
-        <string>创建时间：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLineEdit" name="createTime"/>
-     </item>
-     <item row="11" column="0">
-      <widget class="QLabel" name="Label_10">
-       <property name="text">
-        <string>修改人员：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="1">
-      <widget class="QLineEdit" name="updateID"/>
-     </item>
-     <item row="12" column="0">
-      <widget class="QLabel" name="Label_11">
-       <property name="text">
-        <string>修改时间：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="12" column="1">
-      <widget class="QLineEdit" name="updateTime"/>
-     </item>
-     <item row="13" column="0">
-      <widget class="QLabel" name="Label_12">
-       <property name="text">
-        <string>备注：</string>
-       </property>
-      </widget>
-     </item>
-     <item row="13" column="1">
-      <widget class="QTextEdit" name="remark"/>
-     </item>
-     <item row="6" column="0">
+     <item row="4" column="0">
       <widget class="QLabel" name="Label_13">
        <property name="text">
         <string>交付日期：</string>
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="4" column="1">
       <widget class="QLineEdit" name="deliverDate"/>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="Label_6">
+       <property name="text">
+        <string>接收单位：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="receiveCompany"/>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="Label_7">
+       <property name="text">
+        <string>接收人员：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="receiver"/>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLabel" name="Label_8">
+       <property name="text">
+        <string>创建人员：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="createID"/>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLabel" name="Label_9">
+       <property name="text">
+        <string>创建时间：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLineEdit" name="createTime"/>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLabel" name="Label_10">
+       <property name="text">
+        <string>修改人员：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1">
+      <widget class="QLineEdit" name="updateID"/>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLabel" name="Label_11">
+       <property name="text">
+        <string>修改时间：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="1">
+      <widget class="QLineEdit" name="updateTime"/>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="Label_14">
+       <property name="text">
+        <string>技术文档：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QPushButton" name="documentPathButton">
+       <property name="text">
+        <string>选择文档</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLabel" name="Label_12">
+       <property name="text">
+        <string>备注：</string>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="1">
+      <widget class="QTextEdit" name="remark"/>
      </item>
     </layout>
    </item>

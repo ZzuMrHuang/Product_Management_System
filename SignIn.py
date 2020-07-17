@@ -6,6 +6,8 @@ import qdarkstyle
 import hashlib
 from PyQt5.QtSql import *
 
+from Login_recorder import insert_info, update_currentLoginState
+
 
 class SignInWidget(QWidget):
     is_admin_signal = pyqtSignal()
@@ -114,6 +116,7 @@ class SignInWidget(QWidget):
             print(QMessageBox.information(self, "提示", "该账号不存在!", QMessageBox.Yes, QMessageBox.Yes))
         else:
             if (UserId == query.value(0) and hl.hexdigest() == query.value(2)):
+
                 # 如果是管理员
                 if (query.value(3)==1):
                     self.is_admin_signal.emit()
@@ -145,6 +148,8 @@ class SignInWidget(QWidget):
             print(QMessageBox.information(self, "提示", "该账号不存在!", QMessageBox.Yes, QMessageBox.Yes))
         else:
             if (UserId == query.value(0) and hl.hexdigest() == query.value(1)):
+                update_currentLoginState()
+                insert_info(UserId)
                 # 如果是管理员
                 if (query.value(2)==1):
                     self.is_admin_signal.emit()

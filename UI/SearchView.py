@@ -120,20 +120,41 @@ class MySearchWidget(object):
             self.queryModel.refreshPage()
             self.queryModel.update()
 
+    def selectDetailButtonEvent(self, Widget):
+        """
+       hsj 修改产品批次信息
+       :param Widget: 要显示的窗体
+       :return:
+       """
+        # 判断复选框是否只选中一个
+        a = self.isCorrect()
+        if a == 0:
+            return
+        result = self.queryModel.selectSingleTable()
+        batchDialog = Widget
+        form = QDialog()
+        batchDialog.setupUi(form)
+        batchDialog.showData(result, self.queryModel)
+        form.show()
+        a = form.exec()
+        # 如果对话框关闭，则对查询数据进行更行
+        if a == 0:
+            self.queryModel.refreshPage()
+            self.queryModel.update()
 
 
     def preButtonEvent(self):
-        """
-        hsj 上一页按钮事件
-        :return:
-        """
-        if self.queryModel.currentPage == 0:
-            QMessageBox.information(QDialog(), "提示", "已经是第一页！", QMessageBox.Yes, QMessageBox.Yes)
-            return
-        else:
-            self.queryModel.prePage()
-            self.queryModel.update()
-            self.updateUI()
+            """
+            hsj 上一页按钮事件
+            :return:
+            """
+            if self.queryModel.currentPage == 0:
+                QMessageBox.information(QDialog(), "提示", "已经是第一页！", QMessageBox.Yes, QMessageBox.Yes)
+                return
+            else:
+                self.queryModel.prePage()
+                self.queryModel.update()
+                self.updateUI()
 
     def nextButtonEvent(self):
         """

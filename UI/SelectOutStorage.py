@@ -9,7 +9,6 @@
 from datetime import datetime
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDateTime
 from PyQt5.QtSql import QSqlQuery
 
 from Utils import openDB
@@ -137,6 +136,7 @@ class SelectOutStorage(object):
         self.updateTime = QtWidgets.QDateTimeEdit(Dialog)
         self.updateTime.setEnabled(False)
         self.updateTime.setObjectName("updateTime")
+        self.updateTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.formLayout.setWidget(12, QtWidgets.QFormLayout.FieldRole, self.updateTime)
         self.label_8 = QtWidgets.QLabel(Dialog)
         self.label_8.setObjectName("label_8")
@@ -197,8 +197,9 @@ class SelectOutStorage(object):
         self.isReturn.setEditText(list[5])
         self.inRecorderPerson.setText(list[6])
         self.createTime.setDateTime(datetime.strptime(list[7], "%Y-%m-%d %H:%M:%S"))
+        self.createTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
         self.updateID.setText(list[8])
-        self.updateTime.setDateTime(QDateTime.fromString(list[9]))
+        self.updateTime.setDateTime(datetime.strptime(list[9], "%Y-%m-%d %H:%M:%S"))
         self.remark.setText(list[10])
         db = openDB()
         query = QSqlQuery()
@@ -206,7 +207,8 @@ class SelectOutStorage(object):
         query.exec(sql)
         if query.next():
             self.outDate.setDate(datetime.strptime(query.value(2), "%Y-%m-%d"))
-            self.outReason.setText(query.value(6))
-            self.usedID.setText(str(query.value(3)))
-            self.usedDepartmentNO.setText(str(query.value(4)))
+        self.outDate.setDisplayFormat("yyyy-MM-dd")
+        self.outReason.setText(query.value(6))
+        self.usedID.setText(str(query.value(3)))
+        self.usedDepartmentNO.setText(str(query.value(4)))
         db.close()

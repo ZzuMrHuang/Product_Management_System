@@ -82,10 +82,10 @@ class AlterOutStorage(object):
         self.Label_3 = QtWidgets.QLabel(Dialog)
         self.Label_3.setObjectName("Label_3")
         self.formLayout.setWidget(7, QtWidgets.QFormLayout.LabelRole, self.Label_3)
-        self.inRecorderPerson = QtWidgets.QLineEdit(Dialog)
-        self.inRecorderPerson.setEnabled(True)
-        self.inRecorderPerson.setObjectName("inRecorderPerson")
-        self.formLayout.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.inRecorderPerson)
+        self.outRecorderPerson = QtWidgets.QLineEdit(Dialog)
+        self.outRecorderPerson.setEnabled(True)
+        self.outRecorderPerson.setObjectName("outRecorderPerson")
+        self.formLayout.setWidget(7, QtWidgets.QFormLayout.FieldRole, self.outRecorderPerson)
         self.Label_4 = QtWidgets.QLabel(Dialog)
         self.Label_4.setObjectName("Label_4")
         self.formLayout.setWidget(8, QtWidgets.QFormLayout.LabelRole, self.Label_4)
@@ -180,7 +180,10 @@ class AlterOutStorage(object):
         # 设置创建时间
         self.updateTime.setDateTime(QDateTime.currentDateTime())
         self.updateTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        # 提交槽函数
         ok_button.clicked.connect(self.ok_fun)
+        # 取消槽函数
+        cancel_button.clicked.connect(self.cancel_fun)
 
     def updateData(self, list, queryModel):
         """
@@ -194,8 +197,9 @@ class AlterOutStorage(object):
         self.outStorageNo.setText(list[3])
         self.outTechState.setText(list[4])
         self.isReturn.setEditText(list[5])
-        self.inRecorderPerson.setText(list[6])
         self.createTime.setDateTime(datetime.strptime(list[7], "%Y-%m-%d %H:%M:%S"))
+        self.createTime.setDisplayFormat("yyyy-MM-dd hh:mm:ss")
+        self.updateID.setText(list[8])
         self.remark.setText(list[10])
         db = openDB()
         query = QSqlQuery()
@@ -203,31 +207,58 @@ class AlterOutStorage(object):
         query.exec(sql)
         if query.next():
             self.outDate.setDateTime(datetime.strptime(query.value(2), "%Y-%m-%d"))
-            self.outReason.setText(query.value(6))
+            self.outDate.setDisplayFormat("yyyy-MM-dd")
             self.usedID.setText(str(query.value(3)))
             self.usedDepartmentNO.setText(str(query.value(4)))
+            self.outRecorderPerson.setText(str(query.value(5)))
+            self.outReason.setText(query.value(6))
         db.close()
 
     def ok_fun(self):
-        db = openDB()
-        q = QSqlQuery()
-        sql = "UPDATE T_Out_Base SET outdate='%s', usedid='%s', useddepartmentid='%s', recorderid='%s', " \
-              "outreason='%s', " \
-              "createid='%s', createtime='%s', updateid='%s', updatetime='%s', remark='%s'  WHERE OutNO='%s'" \
-              % (self.outDate.text(), self.usedID.text(), self.usedDepartmentNO.text(), self.inRecorderPerson.text(),
-                 self.outReason.text(), 1, self.createTime.text(), self.updateID.text(), self.updateTime.text(),
-                 self.remark.toPlainText(),
-                 self.outNO.text())
-        q.exec(sql)
-        db.commit()
-        sql = "UPDATE T_Out_Detail SET ProductNO='%s', OutStorageNO='%s', OutTechState='%s', IsReturn='%s', " \
-              "CreateID='%s', createtime='%s', updatetime='%s', remark='%s'  WHERE OutNO='%s'" \
-              % (self.productNO.text(), self.outStorageNo.text(), self.outTechState.text(),
-                 self.isReturn.currentText(), 1, self.createTime.text(), self.updateTime.text(),
-                 self.remark.toPlainText(), self.outNO.text())
-        q.exec(sql)
-        db.commit()
-        db.close()
-        confirm = QMessageBox.information(QDialog(), "提示", "出库信息修改成功！", QMessageBox.Yes, QMessageBox.Yes)
-        if confirm == QMessageBox.Yes:
-            self.dialog.close()
+        verify_values = [self.outNO.text(),
+                         self.outDate.text(),
+                         self.usedID.text(),
+                         self.usedDepartmentNO.text(),
+                         self.outRecorderPerson.text(),
+                         self.outReason.text(),
+                         self.createTime.text(),
+                         self.remark.toPlainText(),
+                         self.productNO.text(),
+                         self.outStorageNo.text(),
+                         self.outTechState.text(),
+                         self.isReturn.currentText(),
+                         self.createTime.text(),
+                         self.remark.toPlainText()]
+        flag = True
+        for value in verify_values:
+            if value == ' ' or value == '0' or value == '':
+                flag = False
+                QMessageBox.information(QDialog(), "错误", "输入值不能为空,请重新检查输入！", QMessageBox.No, QMessageBox.No)
+        if flag:
+            db = openDB()
+            q = QSqlQuery()
+            sql = "UPDATE T_Out_Base SET outdate='%s', usedid='%s', useddepartmentid='%s', recorderid='%s', " \
+                  "outreason='%s', " \
+                  "createid='%s', createtime='%s', updateid='%s', updatetime='%s', remark='%s'  WHERE OutNO='%s'" \
+                  % (self.outDate.text(), self.usedID.text(), self.usedDepartmentNO.text(),
+                     self.outRecorderPerson.text(),
+                     self.outReason.text(), 1, self.createTime.text(), self.updateID.text(), self.updateTime.text(),
+                     self.remark.toPlainText(),
+                     self.outNO.text())
+            q.exec(sql)
+            db.commit()
+            sql = "UPDATE T_Out_Detail SET ProductNO='%s', OutStorageNO='%s', OutTechState='%s', IsReturn='%s', " \
+                  "CreateID='%s', createtime='%s', UpdateID='%s',updatetime='%s', remark='%s'  WHERE OutNO='%s'" \
+                  % (self.productNO.text(), self.outStorageNo.text(), self.outTechState.text(),
+                     self.isReturn.currentText(), 1, self.createTime.text(), self.updateID.text(),
+                     self.updateTime.text(),
+                     self.remark.toPlainText(), self.outNO.text())
+            q.exec(sql)
+            db.commit()
+            db.close()
+            confirm = QMessageBox.information(QDialog(), "提示", "出库信息修改成功！", QMessageBox.Yes, QMessageBox.Yes)
+            if confirm == QMessageBox.Yes:
+                self.dialog.close()
+
+    def cancel_fun(self):
+        self.dialog.close()

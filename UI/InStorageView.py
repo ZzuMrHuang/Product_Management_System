@@ -130,7 +130,7 @@ class InStorageWidget(MySearchWidget):
         self.previousButton.setText(_translate("InStorageForm", "上一页"))
         self.nextButton.setText(_translate("InStorageForm", "下一页"))
         # tableView数据设置
-        headerRow = ["ID", "产品编号", "入库编号", "登记人", "技术状态", "是否用过", "创建人ID", "创建时间", "更新人ID", "更新时间", "备注"]
+        headerRow = ["ID", "产品编号", "库房", "登记人", "技术状态", "是否用过", "创建人ID", "创建时间", "更新人ID", "更新时间", "备注", "入库编号"]
         self.tableView.setModel(self.queryModel)
         self.queryModel = MySearchTableModel("T_In_Detail", headerRow)
         self.tableView.setModel(self.queryModel)

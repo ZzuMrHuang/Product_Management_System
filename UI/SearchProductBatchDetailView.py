@@ -1,15 +1,21 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'SearchProductBatchDetailView_new.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import Qt
-from PyQt5.QtSql import QSqlTableModel, QSqlDatabase
-from PyQt5.QtWidgets import QTableView, QHeaderView, QMessageBox, QDialog, QWidget, QApplication
+from PyQt5.QtWidgets import QHeaderView, QTableView, QDialog, QApplication, QWidget, QMessageBox
 
-from UI.MySearchBatchModel import CheckBoxHeader, MySearchTableModel
-from UI.SearchView import MySearchWidget
-from UI.SelectSingleProductView import SelectSingleProductWidget
-from UI.addProductBatchView import AddProductBatchWidget
+from UI.AddProductView import AddProductWidget
+from MySearchBatchModel import CheckBoxHeader, MySearchTableModel
+from SearchView import MySearchWidget
+from SelectSingleProductView import SelectSingleProductWidget
 from Utils import openDB
+from addProductBatchView import AddProductBatchWidget
 
 
 class SelectProductBatchDetailWidget(MySearchWidget):
@@ -36,6 +42,9 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.addBatchButton = QtWidgets.QPushButton(Form)
         self.addBatchButton.setObjectName("addBatchButton")
         self.horizontalLayout_5.addWidget(self.addBatchButton)
+        self.selectBatch = QtWidgets.QPushButton(Form)
+        self.selectBatch.setObjectName("selectBatch")
+        self.horizontalLayout_5.addWidget(self.selectBatch)
         self.selectProduct = QtWidgets.QPushButton(Form)
         self.selectProduct.setObjectName("selectProduct")
         self.horizontalLayout_5.addWidget(self.selectProduct)
@@ -46,6 +55,9 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.deleteBatchButton = QtWidgets.QPushButton(Form)
         self.deleteBatchButton.setObjectName("deleteBatchButton")
         self.horizontalLayout_3.addWidget(self.deleteBatchButton)
+        self.selectDocument = QtWidgets.QPushButton(Form)
+        self.selectDocument.setObjectName("selectDocument")
+        self.horizontalLayout_3.addWidget(self.selectDocument)
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -66,14 +78,13 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.horizontalLayout.addWidget(self.comboBox)
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
-
         # 中间手动代码部分 表格UI构建
         self.db = openDB()
         self.tableView = QTableView()
 
 
         # hsj 自动义的tableModel
-        headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        headerRow = ["批次号", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "备注"]
         self.queryModel = MySearchTableModel("T_Product_BatchDetail", headerRow)
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()
@@ -83,7 +94,6 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableView.setModel(self.queryModel)
         self.verticalLayout.addWidget(self.tableView)
-
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -116,7 +126,6 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.horizontalLayout_4.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout_4)
 
-
         self.retranslateUi(Form)
         self.bindButton()
         QtCore.QMetaObject.connectSlotsByName(Form)
@@ -124,21 +133,21 @@ class SelectProductBatchDetailWidget(MySearchWidget):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Form"))
-        self.label.setText(_translate("Form", "产品批次查询"))
+        self.label.setText(_translate("Form", "产品组件查询"))
         self.addBatchButton.setText(_translate("Form", "新建批次"))
+        self.selectBatch.setText(_translate("Form", "查看批次"))
         self.selectProduct.setText(_translate("Form", "查看产品"))
         self.alterVBatchButton.setText(_translate("Form", "修改批次"))
         self.deleteBatchButton.setText(_translate("Form", "删除批次"))
+        self.selectDocument.setText(_translate("Form", "查看文档"))
         self.searchButton.setText(_translate("Form", "查询"))
-        self.comboBox.setItemText(0, _translate("Form", "按批次号查询"))
-        self.comboBox.setItemText(1, _translate("Form", "按产品编号查询"))
-        self.comboBox.setItemText(2, _translate("Form", "按接收单位查询"))
+        self.comboBox.setItemText(0, _translate("Form", "按产品号查询"))
+        self.comboBox.setItemText(1, _translate("Form", "按产品名查询"))
+        self.comboBox.setItemText(2, _translate("Form", "按批次号查询"))
         self.label_2.setText(_translate("Form", "跳转至第"))
         self.jumpEdit.setText(_translate("Form", "1"))
-
         # 更新页码总页数 复制进去
         self.totalPageLabel.setText(_translate("Form", "/  " + str(self.queryModel.totalPage) + "  页"))
-
         self.jumpButton.setText(_translate("Form", "跳转"))
         self.previousButton.setText(_translate("Form", "上一页"))
         self.nextButton.setText(_translate("Form", "下一页"))
@@ -151,7 +160,7 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         # 新建按钮
         self.addBatchButton.clicked.connect(lambda :self.addButtonEvent(AddProductBatchWidget()))
         # 查看产品
-        self.selectProduct.clicked.connect(lambda :self.selectButtonEvent(SelectSingleProductWidget()))
+        self.selectProduct.clicked.connect(lambda :self.selectButtonEvent(AddProductWidget()))
         # 修改批次
         self.alterVBatchButton.clicked.connect(lambda :self.updateButtonEvent(AddProductBatchWidget()))
 
@@ -166,6 +175,14 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         self.jumpButton.clicked.connect(self.jumpButtonEvent)
         # 添加查询
         self.searchButton.clicked.connect(self.searchButtonEvent)
+        # 查询文档
+        self.selectDocument.clicked.connect(self.selectDocumentEvent)
+        # 查询批次
+        self.selectBatch.clicked.connect(lambda :self.selectDetailButtonEvent(AddProductBatchWidget()))
+
+        # 下面是无需改动的按钮
+        # 删除按钮))
+
 
     def selectButtonEvent(self, Widget):
         """
@@ -178,13 +195,28 @@ class SelectProductBatchDetailWidget(MySearchWidget):
         if a == 0:
             return
         result = self.queryModel.selectSingleTableForeign()
-        productDiglog = Widget
+        batchDialog = Widget
         form = QDialog()
-        productDiglog.setupUi(form)
-        productDiglog.setData(result)
+        batchDialog.setupUi(form)
+        batchDialog.showData(result, self.queryModel)
         form.show()
-        form.exec()
+        a = form.exec()
+        # 如果对话框关闭，则对查询数据进行更行
+        if a == 0:
+            self.queryModel.refreshPage()
+            self.queryModel.update()
 
+    def selectDocumentEvent(self):
+        # 判断复选框是否只选中一个
+        a = self.isCorrect()
+        if a == 0:
+            return
+        result = self.queryModel.selectSingleTable()
+        path = result[-1]
+        import os
+        if path == "选择文档" or path == "":
+            return
+        os.startfile(path)
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

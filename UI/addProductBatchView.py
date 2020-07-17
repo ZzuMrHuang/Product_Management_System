@@ -1,20 +1,23 @@
 # -*- coding: utf-8 -*-
 
+# Form implementation generated from reading ui file 'addProductBatchView_new.ui'
+#
+# Created by: PyQt5 UI code generator 5.13.0
+#
+# WARNING! All changes made in this file will be lost!
 import sys
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QDate
-from PyQt5.QtSql import QSqlDatabase, QSqlQuery
-from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QDialog
+from PyQt5.QtSql import QSqlQuery
+from PyQt5.QtWidgets import QApplication, QWidget, QMessageBox, QDialog, QFileDialog
 
 from Utils import openDB
 
 
 class AddProductBatchWidget(object):
     def setupUi(self, Dialog):
-        self.dialog = Dialog
         Dialog.setObjectName("Dialog")
-        Dialog.resize(792, 779)
+        Dialog.resize(770, 800)
         font = QtGui.QFont()
         font.setFamily("微软雅黑 Light")
         font.setPointSize(10)
@@ -45,7 +48,7 @@ class AddProductBatchWidget(object):
         self.iDLabel.setObjectName("iDLabel")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.LabelRole, self.iDLabel)
         self.productID = QtWidgets.QLineEdit(Dialog)
-        self.productID.setObjectName("productID")
+        self.productID.setObjectName("ProductID")
         self.formLayout.setWidget(1, QtWidgets.QFormLayout.FieldRole, self.productID)
         self.Label_4 = QtWidgets.QLabel(Dialog)
         self.Label_4.setObjectName("Label_4")
@@ -59,6 +62,12 @@ class AddProductBatchWidget(object):
         self.deliverer = QtWidgets.QLineEdit(Dialog)
         self.deliverer.setObjectName("deliverer")
         self.formLayout.setWidget(3, QtWidgets.QFormLayout.FieldRole, self.deliverer)
+        self.Label_13 = QtWidgets.QLabel(Dialog)
+        self.Label_13.setObjectName("Label_13")
+        self.formLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.Label_13)
+        self.deliverDate = QtWidgets.QLineEdit(Dialog)
+        self.deliverDate.setObjectName("deliverDate")
+        self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.deliverDate)
         self.Label_6 = QtWidgets.QLabel(Dialog)
         self.Label_6.setObjectName("Label_6")
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.Label_6)
@@ -95,19 +104,18 @@ class AddProductBatchWidget(object):
         self.updateTime = QtWidgets.QLineEdit(Dialog)
         self.updateTime.setObjectName("updateTime")
         self.formLayout.setWidget(10, QtWidgets.QFormLayout.FieldRole, self.updateTime)
+        self.Label_14 = QtWidgets.QLabel(Dialog)
+        self.Label_14.setObjectName("Label_14")
+        self.formLayout.setWidget(11, QtWidgets.QFormLayout.LabelRole, self.Label_14)
+        self.documentPathButton = QtWidgets.QPushButton(Dialog)
+        self.documentPathButton.setObjectName("documentPathButton")
+        self.formLayout.setWidget(11, QtWidgets.QFormLayout.FieldRole, self.documentPathButton)
         self.Label_12 = QtWidgets.QLabel(Dialog)
         self.Label_12.setObjectName("Label_12")
-        self.formLayout.setWidget(11, QtWidgets.QFormLayout.LabelRole, self.Label_12)
+        self.formLayout.setWidget(12, QtWidgets.QFormLayout.LabelRole, self.Label_12)
         self.remark = QtWidgets.QTextEdit(Dialog)
         self.remark.setObjectName("remark")
-        self.formLayout.setWidget(11, QtWidgets.QFormLayout.FieldRole, self.remark)
-        self.Label_13 = QtWidgets.QLabel(Dialog)
-        self.Label_13.setObjectName("Label_13")
-        self.formLayout.setWidget(4, QtWidgets.QFormLayout.LabelRole, self.Label_13)
-        self.deliverDate = QtWidgets.QDateEdit(Dialog)
-        self.deliverDate.setDate(QDate.currentDate())
-        self.deliverDate.setObjectName("deliverDate")
-        self.formLayout.setWidget(4, QtWidgets.QFormLayout.FieldRole, self.deliverDate)
+        self.formLayout.setWidget(12, QtWidgets.QFormLayout.FieldRole, self.remark)
         self.verticalLayout.addLayout(self.formLayout)
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
@@ -124,11 +132,14 @@ class AddProductBatchWidget(object):
         spacerItem2 = QtWidgets.QSpacerItem(250, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout)
+        self.createID.setText("--")
+        self.createTime.setText("--")
+        self.updateTime.setText("--")
+        self.updateID.setText("--")
         self.createID.setEnabled(False)
         self.createTime.setEnabled(False)
         self.updateTime.setEnabled(False)
         self.updateID.setEnabled(False)
-
         # hsj
         self.bindButton(Dialog)
 
@@ -143,20 +154,18 @@ class AddProductBatchWidget(object):
         self.iDLabel.setText(_translate("Dialog", "产品ID："))
         self.Label_4.setText(_translate("Dialog", "交付单位:"))
         self.Label_5.setText(_translate("Dialog", "交付人员："))
+        self.Label_13.setText(_translate("Dialog", "交付日期："))
         self.Label_6.setText(_translate("Dialog", "接收单位："))
         self.Label_7.setText(_translate("Dialog", "接收人员："))
         self.Label_8.setText(_translate("Dialog", "创建人员："))
         self.Label_9.setText(_translate("Dialog", "创建时间："))
         self.Label_10.setText(_translate("Dialog", "修改人员："))
         self.Label_11.setText(_translate("Dialog", "修改时间："))
+        self.Label_14.setText(_translate("Dialog", "技术文档："))
+        self.documentPathButton.setText(_translate("Dialog", "选择文档"))
         self.Label_12.setText(_translate("Dialog", "备注："))
-        self.Label_13.setText(_translate("Dialog", "交付日期："))
         self.conserveButton.setText(_translate("Dialog", "保存"))
         self.cancelButton.setText(_translate("Dialog", "取消"))
-        self.createID.setText("--")
-        self.createTime.setText("--")
-        self.updateID.setText("--")
-        self.updateTime.setText("--")
 
     def bindButton(self, Dialog):
         """
@@ -166,6 +175,7 @@ class AddProductBatchWidget(object):
         """
         self.conserveButton.clicked.connect(lambda: self.conserveButtonEvent(Dialog))
         self.cancelButton.clicked.connect(lambda: self.cancelButtonEvent(Dialog))
+        self.documentPathButton.clicked.connect(self.documentPathButtonEvent)
 
     def conserveButtonEvent(self, Dialog):
         """
@@ -186,24 +196,25 @@ class AddProductBatchWidget(object):
         updateID = self.updateID.text()
         updateTime = self.updateTime.text()
         remark = self.remark.toPlainText()
+        documentPath = self.documentPathButton.text()
         # 如果必要的信息都不为空
         if batchNO == "" or productID == "" or recorder == "" or recordDate == "" or deliverCompany == "" or deliverer == "" \
-            or deliverDate == "" or receiveCompany == "" or receiver == "":
+                or deliverDate == "" or receiveCompany == "" or receiver == "":
             print(QMessageBox.warning(QDialog(), "警告", "有字段为空，添加失败！", QMessageBox.Yes, QMessageBox.Yes))
             return
         else:
             num = self.checkOn(batchNO, productID)
             if num == 0:
-                revert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (
+                revert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s', '%s')" % (
                     self.pre_list[0], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6],
-                    self.pre_list[7], self.pre_list[9], self.pre_list[11], self.pre_list[13])
+                    self.pre_list[7], self.pre_list[9], self.pre_list[11], self.pre_list[12], self.pre_list[13])
                 self.query.exec(revert_sql)
                 self.db.commit()
                 return
             import time
             createTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '--', '%s')" % (
-                batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, remark)
+            insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '--', '%s', '%s')" % (
+                batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, documentPath, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "批次信息新建成功！", QMessageBox.Yes, QMessageBox.Yes)
@@ -238,6 +249,7 @@ class AddProductBatchWidget(object):
         updateID = self.updateID.text()
         updateTime = self.updateTime.text()
         remark = self.remark.toPlainText()
+        documentPath = self.documentPathButton.text()
         # 如果必要的信息都不为空
         if batchNO == "" or productID == "" or recorder == "" or recordDate == "" or deliverCompany == "" or deliverer == "" \
                 or deliverDate == "" or receiveCompany == "" or receiver == "":
@@ -249,13 +261,20 @@ class AddProductBatchWidget(object):
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (
-                batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, updateTime,remark)
+            insert_sql = "INSERT INTO T_Product_BatchDetail VALUES ('%s', '--', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s', '%s')" % (
+                batchNO, productID, deliverDate, deliverCompany, deliverer, receiveCompany, receiver, createTime, updateTime, documentPath, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "批次信息更新成功！", QMessageBox.Yes, QMessageBox.Yes)
             if confirm == QMessageBox.Yes:
                 self.dialog.close()
+
+
+    def documentPathButtonEvent(self):
+        filePath, _ = QFileDialog.getOpenFileName(caption="选择文件", filter="PDF文件 (*.pdf);Word文件 (*.doc;*.docx)")
+        self.documentPathButton.setText(filePath)
+        self.documentPathButton.setDisabled(True)
+
 
     def checkOn(self, batchNO, productID):
         """
@@ -264,7 +283,7 @@ class AddProductBatchWidget(object):
         """
         self.db = openDB()
         self.query = QSqlQuery()
-        sql = "SELECT * FROM T_Product_BatchDetail WHERE BatchNO = '%s'" % batchNO
+        sql = "SELECT * FROM T_Product_BatchDetail WHERE batchNO = '%s'" % batchNO
         self.query.exec(sql)
         if self.query.next():
             print(QMessageBox.warning(QDialog(), "警告", "批次编号已存在，请更换后重试！", QMessageBox.Yes, QMessageBox.Yes))
@@ -288,21 +307,42 @@ class AddProductBatchWidget(object):
         self.conserveButton.disconnect()
         self.conserveButton.clicked.connect(lambda :self.updateButtonEvent(queryModel))
         self.batchNO.setText(list[0])
-        self.productID.setText(list[2])
-        # self.deliverDate.setDate(QDate.currentDate())
-        self.deliverCompany.setText(list[4])
-        self.deliverer.setText(list[5])
-        self.receiveCompany.setText(list[6])
-        self.receiver.setText(list[7])
+        self.productID.setText(list[1])
+        self.deliverDate.setText(list[2])
+        self.deliverCompany.setText(list[3])
+        self.deliverer.setText(list[4])
+        self.receiveCompany.setText(list[5])
+        self.receiver.setText(list[6])
 
-        self.createID.setText(list[8])
-        self.createTime.setText(list[9])
-        self.updateID.setText(list[10])
-        self.updateTime.setText(list[11])
-        self.remark.setText(list[12])
+        self.createID.setText(list[7])
+        self.createTime.setText(list[8])
+        self.updateID.setText(list[9])
+        self.updateTime.setText(list[10])
+        self.remark.setText(list[11])
+        self.documentPathButton.setText(list[12])
+
+    def showData(self, list, queryModel):
+        self.updateData(list, queryModel)
+        self.label.setText("详细批次信息")
+        self.batchNO.setDisabled(True)
+        self.productID.setDisabled(True)
+        self.deliverDate.setDisabled(True)
+        self.deliverCompany.setDisabled(True)
+        self.deliverer.setDisabled(True)
+        self.receiveCompany.setDisabled(True)
+        self.receiver.setDisabled(True)
+
+        self.createID.setDisabled(True)
+        self.createTime.setDisabled(True)
+        self.updateID.setDisabled(True)
+        self.updateTime.setDisabled(True)
+        self.remark.setDisabled(True)
+        self.documentPathButton.setDisabled(True)
+        self.conserveButton.setVisible(False)
+        self.cancelButton.setVisible(False)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app = QApplication(sys.argv)
     form = QWidget()
     w = AddProductBatchWidget()

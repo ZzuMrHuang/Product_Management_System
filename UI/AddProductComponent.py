@@ -12,6 +12,7 @@ from PyQt5.QtCore import QDate
 from PyQt5.QtSql import QSqlQuery
 from PyQt5.QtWidgets import QMessageBox, QDialog
 
+from Login_recorder import getCurrentUserId
 from Utils import openDB
 
 
@@ -173,7 +174,8 @@ class AddComponentWidget(object):
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.verticalLayout.addLayout(self.horizontalLayout_2)
-
+        self.displayOrderLabel.setVisible(False)
+        self.displayOrder.setVisible(False)
         self.createID.setEnabled(False)
         self.createTime.setEnabled(False)
         self.updateTime.setEnabled(False)
@@ -240,10 +242,7 @@ class AddComponentWidget(object):
         isUsedCountLimit = self.isUsedCountLimit.text()
         maxUsedCount = self.maxUsedCount.text()
         haveUsedCount = self.maxUsedCount.text()
-        createID = self.createID.text()
-        createTime = self.createTime.text()
-        updateTime = self.updateTime.toPlainText()
-        updateID = self.updateID.text()
+        createID = getCurrentUserId()
         remark = self.remark.toPlainText()
 
         # 如果必要的信息都不为空
@@ -253,16 +252,11 @@ class AddComponentWidget(object):
         else:
             num = self.checkOn(ID, componentName, productNO)
             if num == 0:
-                revert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" \
-                             % (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6],
-                                self.pre_list[7], self.pre_list[8], self.pre_list[9], self.pre_list[10], self.pre_list[11], self.pre_list[12], self.pre_list[14], self.pre_list[16], self.pre_list[17])
-                self.query.exec(revert_sql)
-                self.db.commit()
                 return
             import time
             createTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')"\
-                         % (ID, productNO, componentName, componentTypeID, parentID, displayOrder, isLifeRemind, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount,createTime, createTime, remark)
+            insert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '--', '--', '%s')"\
+                         % (ID, productNO, componentName, componentTypeID, parentID, displayOrder, isLifeRemind, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createID, createTime, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "组件新建成功！", QMessageBox.Yes, QMessageBox.Yes)
@@ -309,10 +303,16 @@ class AddComponentWidget(object):
         else:
             num = self.checkOn(ID, componentName, productNO)
             if num == 0:
+                revert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" \
+                             % (self.pre_list[0], self.pre_list[1], self.pre_list[2], self.pre_list[3], self.pre_list[4], self.pre_list[5], self.pre_list[6],
+                                self.pre_list[7], self.pre_list[8], self.pre_list[9], self.pre_list[10], self.pre_list[11], self.pre_list[12], self.pre_list[13], self.pre_list[14], self.pre_list[15], self.pre_list[16], self.pre_list[17])
+                self.query.exec(revert_sql)
+                self.db.commit()
                 return
             import time
             updateTime = time.strftime("%Y-%m-%d %H:%M:%S")
-            insert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '--', '%s', '--', '%s', '%s')" % (ID, productNO, componentName, componentTypeID, parentID, displayOrder, isLifeRemind, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount,createTime, updateTime, remark)
+            insert_sql = "INSERT INTO T_Product_Component VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')" % \
+                         (ID, productNO, componentName, componentTypeID, parentID, displayOrder, isLifeRemind, life, startDate, daysBefore, isUsedCountLimit, maxUsedCount, haveUsedCount, createID, createTime, updateID, updateTime, remark)
             self.query.exec(insert_sql)
             self.db.commit()
             confirm = QMessageBox.information(QDialog(), "提示", "组件更新成功！", QMessageBox.Yes, QMessageBox.Yes)
@@ -376,16 +376,40 @@ class AddComponentWidget(object):
         self.componentName.setText(list[2])
         self.componentTypeID.setText(list[3])
         self.parentID.setText(list[4])
-        self.displayOrder.setText(list[5])
-        self.isLifeRemind.setText(list[6])
-        self.life.setText(list[7])
-        # self.startDate.setText(list[8])
-        self.daysBefore.setText(list[9])
-        self.isUsedCountLimit.setText(list[10])
+        self.isLifeRemind.setText(list[5])
+        self.life.setText(list[6])
+        # self.startDate.setText(list[7])
+        self.daysBefore.setText(list[8])
+        self.isUsedCountLimit.setText(list[9])
+        self.maxUsedCount.setText(list[10])
         self.maxUsedCount.setText(list[11])
-        self.maxUsedCount.setText(list[12])
-        self.createID.setText(list[13])
-        self.createTime.setText(list[14])
-        self.updateTime.setText(list[15])
-        self.updateID.setText(list[16])
-        self.remark.setText(list[17])
+        self.createID.setText(list[12])
+        self.createTime.setText(list[13])
+        self.updateTime.setText(list[14])
+        self.updateID.setText(list[15])
+        self.remark.setText(list[16])
+
+    def showData(self, list, queryModel):
+        self.updateData(list, queryModel)
+        self.label.setText("详细组件信息")
+        self.ID.setDisabled(True)
+        self.productNO.setDisabled(True)
+        self.componentName.setDisabled(True)
+        self.componentTypeID.setDisabled(True)
+        self.parentID.setDisabled(True)
+        self.displayOrder.setDisabled(True)
+        self.isLifeRemind.setDisabled(True)
+        self.life.setDisabled(True)
+        # self.startDate.setText(list[8])
+        self.daysBefore.setDisabled(True)
+        self.isUsedCountLimit.setDisabled(True)
+        self.maxUsedCount.setDisabled(True)
+        self.havaUsedCount.setDisabled(True)
+        self.createID.setDisabled(True)
+        self.createTime.setDisabled(True)
+        self.updateTime.setDisabled(True)
+        self.updateID.setDisabled(True)
+        self.remark.setDisabled(True)
+
+        self.conserveButton.setVisible(False)
+        self.cancelButton.setVisible(False)

@@ -72,7 +72,7 @@ class SearchProductComponentTypeWidget(MySearchWidget):
         print(1111)
 
         # hsj 自动义的tableModel
-        headerRow = ["ID", "组件名称", "DisplayOrder", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        headerRow = ["ID", "组件名称", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
         self.queryModel = MySearchTableModel("T_Product_ComponentType", headerRow)
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()

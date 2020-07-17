@@ -15,24 +15,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="font">
-      <font>
-       <pointsize>16</pointsize>
-      </font>
-     </property>
-     <property name="text">
-      <string>产品组件查询</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-     <property name="margin">
-      <number>20</number>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_3">
      <item>
       <layout class="QHBoxLayout" name="horizontalLayout_5">

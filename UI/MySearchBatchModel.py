@@ -61,13 +61,15 @@ class MySearchTableModel(QAbstractTableModel):
         super(MySearchTableModel, self).__init__(parent)
 
         self.table = table
+        self.headerRow = headerRow
+        self.tableLength = self.getcolumnCount() + 4
         self.setTableInformation()
 
         # 总数据
         self.totalData = self.getData()
 
         # hsj 每页显示的信息数, 总页数
-        self.perPageNum = 10
+        self.perPageNum = 20
         self.currentPage = 0
         self.data_list = []
         self.totalPage = self.getTotalPage()
@@ -78,7 +80,7 @@ class MySearchTableModel(QAbstractTableModel):
         # self.data_list = self.getData()
         # Keep track of which object are checked
         # self.headerRow = ["批次号", "ID", "产品编号", "交付日期", "交付单位", "交付人员", "接收单位", "接收人员", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
-        self.headerRow = headerRow
+
         self.checkList = ['Unchecked' for i in range(len(self.data_list))]
 
     def setTableInformation(self):
@@ -96,26 +98,26 @@ class MySearchTableModel(QAbstractTableModel):
             self.tableForeignLength = 14
         elif self.table == "T_Product":
             self.tableKey = "ProductNO"
-            self.tableLength = 14
+            # self.tableLength = 14-4
             self.tableForeign = "T_Product_Component"
             self.tableForeignKey = "ID"
             self.tableForeignKeyPosition = 1  # 在本表中是根据本表主键在外表中查询
-            self.tableForeignLength = 18
+            self.tableForeignLength = 14
         elif self.table == "T_Product_ComponentType":
             self.tableKey = "ID"
-            self.tableLength = 8
+            # self.tableLength = 8
         elif self.table == "T_Product_Component":
             self.tableKey = "ID"
-            self.tableLength = 18  # 黄帅杰结束
+            # self.tableLength = 17-4  # 黄帅杰结束
         elif self.table == "T_Out_Detail":  # 许帅开始
             self.tableKey = "ID"
-            self.tableLength = 11
+            # self.tableLength = 11
         elif self.table == "T_In_Detail":
             self.tableKey = "ID"
-            self.tableLength = 11  # 许帅结束
+            # self.tableLength = 12  # 许帅结束
         elif self.table =="T_Knowladge_Base_Mangement":
             self.tableKey="Num"
-            self.tableLength = 4
+            # self.tableLength = 4
             self.tableForeign = "T_Knowladge_Base_Mangement"
             self.tableForeignKey = "Num"
             self.tableForeignKeyPosition = 1
@@ -128,10 +130,10 @@ class MySearchTableModel(QAbstractTableModel):
             self.tableLength = 7  # 刘敬楷结束
         elif self.table == "MaintenanceRecord":  # 李振开始
             self.tableKey = "mrID"
-            self.tableLength = 18
+            # self.tableLength = 18
         elif self.table == "MaintenanceWay":
             self.tableKey = "MaintenanceWayID"
-            self.tableLength = 18
+            # self.tableLength = 18
             # 要查询的第二张表的名字
             # self.tableForeign = "Product"
             # self.tableForeignKey = "ProductID"
@@ -139,7 +141,9 @@ class MySearchTableModel(QAbstractTableModel):
             # self.tableForeignLength = 14  # 李振结束
         elif self.table== "T_Fault_Diagnosis":  # 薛程耀开始
             self.tableKey="batchNO"
-            self.tableLength = 5  # 薛程耀结束
+            # self.tableLength = 5  # 薛程耀结束
+        elif self.table == "Login_info":
+            self.tableKey = "id"
 
 
 
@@ -205,7 +209,7 @@ class MySearchTableModel(QAbstractTableModel):
                 # sql = "DELETE FROM T_Product WHERE ProductNO = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
                 sql = "DELETE FROM %s WHERE ParentID = '%s' AND ProductNO = '%s'" % (self.table, self.data_list[i][0], self.data_list[i][1])
-                print(sql)
+                # print(sql)
                 query.exec(sql)
                 # sql = "DELETE FROM T_Product_Component WHERE ProductID = '%s'" % (self.data_list[i][2])
                 # query.exec(sql)
@@ -238,6 +242,38 @@ class MySearchTableModel(QAbstractTableModel):
         for i, isSelected in enumerate(self.checkList):
             if isSelected == "Checked":
                 sql = "DELETE FROM MaintenanceRecord WHERE MrID = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+        db.commit()
+        self.refreshPage()
+
+    def deleteIn(self):
+        """
+        许帅 删除选中的入库信息，并且关联删除
+        :return:
+        """
+        db = openDB()
+        query = QSqlQuery()
+        for i, isSelected in enumerate(self.checkList):
+            if isSelected == "Checked":
+                sql = "DELETE FROM T_In_Detail WHERE ID = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+                sql = "DELETE FROM T_In_Base WHERE ID = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+        db.commit()
+        self.refreshPage()
+
+    def deleteOut(self):
+        """
+       许帅 删除选中的出库信息，并且关联删除
+        :return:
+        """
+        db = openDB()
+        query = QSqlQuery()
+        for i, isSelected in enumerate(self.checkList):
+            if isSelected == "Checked":
+                sql = "DELETE FROM T_Out_Detail WHERE ID = '%s'" % (self.data_list[i][0])
+                query.exec(sql)
+                sql = "DELETE FROM T_Out_Base WHERE ID = '%s'" % (self.data_list[i][0])
                 query.exec(sql)
         db.commit()
         self.refreshPage()
@@ -316,10 +352,20 @@ class MySearchTableModel(QAbstractTableModel):
         :return:
         """
         results = []
+        sql = "SELECT * FROM %s ORDER BY %s" % (self.table, self.tableKey)
         db = openDB()
         query = QSqlQuery()
-        sql = "SELECT * FROM %s ORDER BY %s" % (self.table, self.tableKey)
-        # print(sql)
+        if self.table == "T_Product_BatchDetail":
+            sql = "SELECT BatchNO, ProductNO, DeliverDate, DeliverCompanyName, Deliverer, ReceiveCompanyName, Receiver, Remark, Document FROM %s ORDER BY %s" % (self.table, self.tableKey)
+            print(sql)
+        elif self.table == "T_Product":
+            sql = "SELECT ProductNO, Life, StartDate, DaysBefore, IsUsedCountLimit, MaxUsedCount, HaveUsedCount, Remark FROM %s ORDER BY %s" % (self.table, self.tableKey)
+            print(sql)
+        elif self.table == "T_Product_Component":
+            sql = "SELECT ID, ProductNO, ComponentName, ComponentTypeID, ParentID, IsLifeRemind, Life, StartDate, DaysBefore, IsUsedCountLimit, MaxUsedCount, HaveUsedCount, Remark FROM %s ORDER BY %s" % (self.table, self.tableKey)
+            # self.tableLength = 8
+            print(sql)
+
         a = query.exec(sql)
         # print('a', a)
         while(query.next()):
@@ -338,7 +384,7 @@ class MySearchTableModel(QAbstractTableModel):
         hsj 得到总页数
         :return:
         """
-        return len(self.totalData) // self.perPageNum + 1
+        return (len(self.totalData) -1) // self.perPageNum + 1
 
     def prePage(self):
         """
@@ -403,6 +449,9 @@ class MySearchTableModel(QAbstractTableModel):
         return len(self.data_list)
 
     def columnCount(self, QModelIndex):
+        return len(self.headerRow)
+
+    def getcolumnCount(self):
         return len(self.headerRow)
 
     def data(self, index, role):

@@ -39,21 +39,28 @@
        <item>
         <widget class="QPushButton" name="addBatchButton">
          <property name="text">
-          <string>新建组件</string>
+          <string>新建批次</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="selectBatch">
+         <property name="text">
+          <string>查看批次</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="selectProduct">
          <property name="text">
-          <string>查看子组件</string>
+          <string>查看产品</string>
          </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="alterVBatchButton">
          <property name="text">
-          <string>修改组件信息</string>
+          <string>修改批次</string>
          </property>
         </widget>
        </item>
@@ -63,6 +70,13 @@
       <widget class="QPushButton" name="deleteBatchButton">
        <property name="text">
         <string>删除批次</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="selectDocument">
+       <property name="text">
+        <string>查看文档</string>
        </property>
       </widget>
      </item>

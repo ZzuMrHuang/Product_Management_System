@@ -11,7 +11,6 @@ from UI.MySearchBatchModel import MySearchTableModel, CheckBoxHeader
 from UI.SearchView import MySearchWidget
 from Utils import openDB
 
-
 class SelectProductWidget(MySearchWidget):
     def __init__(self):
         super(SelectProductWidget, self).__init__()
@@ -36,6 +35,9 @@ class SelectProductWidget(MySearchWidget):
         self.addProductButton = QtWidgets.QPushButton(Form)
         self.addProductButton.setObjectName("addProductButton")
         self.horizontalLayout_5.addWidget(self.addProductButton)
+        self.selectProduct = QtWidgets.QPushButton(Form)
+        self.selectProduct.setObjectName("selectProduct")
+        self.horizontalLayout_5.addWidget(self.selectProduct)
         self.selectProductComponent = QtWidgets.QPushButton(Form)
         self.selectProductComponent.setObjectName("selectProductComponent")
         self.horizontalLayout_5.addWidget(self.selectProductComponent)
@@ -66,19 +68,13 @@ class SelectProductWidget(MySearchWidget):
         self.horizontalLayout.addWidget(self.comboBox)
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
         self.verticalLayout.addLayout(self.horizontalLayout_3)
-
-
-        # self.tableView = QtWidgets.QTableView(Form)
-        # self.tableView.setObjectName("tableView")
-        # self.verticalLayout.addWidget(self.tableView)
-
         # 中间手动代码部分 表格UI构建
         self.db = openDB()
         self.tableView = QTableView()
 
 
         # hsj 自动义的tableModel
-        headerRow = ["产品编号", "ID", "产品模型ID", "寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        headerRow = ["产品编号", "寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "备注"]
         self.queryModel = MySearchTableModel("T_Product", headerRow)
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()
@@ -88,9 +84,6 @@ class SelectProductWidget(MySearchWidget):
         self.tableView.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
         self.tableView.setModel(self.queryModel)
         self.verticalLayout.addWidget(self.tableView)
-
-
-
         self.horizontalLayout_4 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_4.setObjectName("horizontalLayout_4")
         spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
@@ -133,18 +126,17 @@ class SelectProductWidget(MySearchWidget):
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "产品信息查询"))
         self.addProductButton.setText(_translate("Form", "新建产品"))
+        self.selectProduct.setText(_translate("Form", "查看产品"))
         self.selectProductComponent.setText(_translate("Form", "查看产品组件"))
         self.alterProductButton.setText(_translate("Form", "修改产品"))
         self.deleteProductButton.setText(_translate("Form", "删除产品"))
         self.searchButton.setText(_translate("Form", "查询"))
-        self.comboBox.setItemText(0, _translate("Form", "按产品编号查询"))
-        self.comboBox.setItemText(1, _translate("Form", "按创建人员查询"))
-        self.comboBox.setItemText(2, _translate("Form", "按寿命查询"))
+        self.comboBox.setItemText(0, _translate("Form", "按产品号查询"))
+        self.comboBox.setItemText(1, _translate("Form", "按产品名查询"))
+        self.comboBox.setItemText(2, _translate("Form", "按批次号查询"))
         self.label_2.setText(_translate("Form", "跳转至第"))
         self.jumpEdit.setText(_translate("Form", "1"))
-
         self.totalPageLabel.setText(_translate("Form", "/  " + str(self.queryModel.totalPage) + "  页"))
-
         self.jumpButton.setText(_translate("Form", "跳转"))
         self.previousButton.setText(_translate("Form", "上一页"))
         self.nextButton.setText(_translate("Form", "下一页"))
@@ -170,6 +162,8 @@ class SelectProductWidget(MySearchWidget):
         self.jumpButton.clicked.connect(self.jumpButtonEvent)
         # 添加查询
         self.searchButton.clicked.connect(self.searchButtonEvent)
+
+        self.selectProduct.clicked.connect(lambda :self.selectDetailButtonEvent(AddProductWidget()))
 
     def deleteButtonEvent(self):
         """
@@ -200,14 +194,15 @@ class SelectProductWidget(MySearchWidget):
         db = openDB()
         queryModel = QSqlQueryModel()
         print("SELECT * FROM T_Product_Component WHERE ID = %s" % (self.queryModel.data_list[select_num][0]))
-        queryModel.setQuery("SELECT * FROM T_Product_Component WHERE ProductNO = %s" % (self.queryModel.data_list[select_num][0]))
-        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "排序索引", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        queryModel.setQuery("SELECT ID, ProductNO, ComponentName, ComponentTypeID, ParentID, IsLifeRemind, Life, StartDate, DaysBefore, IsUsedCountLimit, MaxUsedCount, HaveUsedCount, Remark FROM T_Product_Component WHERE ProductNO = %s" % (self.queryModel.data_list[select_num][0]))
+        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "备注"]
         for i in range(len(headerRow)):
             queryModel.setHeaderData(i, Qt.Horizontal, headerRow[i])
         form = QDialog()
         tableView = QTableView()
         tableView.setModel(queryModel)
         tableView.show()
+        tableView.horizontalHeader().setStretchLastSection(True)
         layout = QVBoxLayout()
         layout.addWidget(tableView)
         form.setLayout(layout)

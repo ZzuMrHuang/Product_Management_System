@@ -35,6 +35,9 @@ class SearchProductComponentWidget(MySearchWidget):
         self.addComponentButton = QtWidgets.QPushButton(Form)
         self.addComponentButton.setObjectName("addComponentButton")
         self.horizontalLayout_5.addWidget(self.addComponentButton)
+        self.selectComponent = QtWidgets.QPushButton(Form)
+        self.selectComponent.setObjectName("selectComponent")
+        self.horizontalLayout_5.addWidget(self.selectComponent)
         self.selectSubComponent = QtWidgets.QPushButton(Form)
         self.selectSubComponent.setObjectName("selectSubComponent")
         self.horizontalLayout_5.addWidget(self.selectSubComponent)
@@ -75,7 +78,7 @@ class SearchProductComponentWidget(MySearchWidget):
 
 
         # hsj 自动义的tableModel
-        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "排序索引", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "备注"]
         self.queryModel = MySearchTableModel("T_Product_Component", headerRow)
         self.tableView.setModel(self.queryModel)
         self.header = CheckBoxHeader()
@@ -128,6 +131,7 @@ class SearchProductComponentWidget(MySearchWidget):
         Form.setWindowTitle(_translate("Form", "Form"))
         self.label.setText(_translate("Form", "产品组件查询"))
         self.addComponentButton.setText(_translate("Form", "新建组件"))
+        self.selectComponent.setText(_translate("Form", "查看组件"))
         self.selectSubComponent.setText(_translate("Form", "查看子组件"))
         self.alterComponentButton.setText(_translate("Form", "修改组件信息"))
         self.deleteComponentButton.setText(_translate("Form", "删除组件"))
@@ -163,6 +167,7 @@ class SearchProductComponentWidget(MySearchWidget):
         self.jumpButton.clicked.connect(self.jumpButtonEvent)
         # 添加查询
         self.searchButton.clicked.connect(self.searchButtonEvent)
+        self.selectComponent.clicked.connect(lambda :self.selectDetailButtonEvent(AddComponentWidget()))
 
     def deleteButtonEvent(self):
         """
@@ -193,8 +198,8 @@ class SearchProductComponentWidget(MySearchWidget):
         db = openDB()
         queryModel = QSqlQueryModel()
         # print("SELECT * FROM T_Product_Component WHERE ParentID = %s" % (self.queryModel.data_list[select_num][0]))
-        queryModel.setQuery("SELECT * FROM T_Product_Component WHERE ParentID = %s" % (self.queryModel.data_list[select_num][0]))
-        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "排序索引", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "创建人员ID", "创建时间", "修改人员ID", "修改时间", "备注"]
+        queryModel.setQuery("SELECT ID, ProductNO, ComponentName, ComponentTypeID, ParentID, IsLifeRemind, Life, StartDate, DaysBefore, IsUsedCountLimit, MaxUsedCount, HaveUsedCount, Remark FROM T_Product_Component WHERE ProductNO = %s" % (self.queryModel.data_list[select_num][0]))
+        headerRow = ["ID", "产品ID", "组件名称", "组件类型ID", "父节点ID", "是否寿命提醒","寿命(天)", "寿命起始日期", "据到期提醒(天)", "使用次数限制", "最多使用次数", "已使用次数", "备注"]
         for i in range(len(headerRow)):
             queryModel.setHeaderData(i, Qt.Horizontal, headerRow[i])
         form = QDialog()
